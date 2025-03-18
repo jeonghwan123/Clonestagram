@@ -21,14 +21,13 @@ public class ImageUploadReqDto {
     @Schema(type = "string", format = "binary")//file 업로드를 위해 추가
     private MultipartFile file;
     private String content;
-    private ContentType type;
 
     public Posts toEntity(String imageName /*, User userEntity*/) {
         return Posts.builder()
 //                    .user(userEntity)
                 .content(content)
                 .mediaName(imageName)
-                .contentType(type)
+                .contentType(ContentType.IMAGE)
                 .createdAt(LocalDateTime.now())
                 .build();
     }
