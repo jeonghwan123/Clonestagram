@@ -1,8 +1,8 @@
-package com.goorm.clonestagram.upload.service;
+package com.goorm.clonestagram.file.service;
 
-import com.goorm.clonestagram.upload.domain.Posts;
-import com.goorm.clonestagram.upload.dto.ImageUploadReqDto;
-import com.goorm.clonestagram.upload.repository.PostsRepository;
+import com.goorm.clonestagram.file.domain.Posts;
+import com.goorm.clonestagram.file.dto.ImageUploadReqDto;
+import com.goorm.clonestagram.file.repository.PostsRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;

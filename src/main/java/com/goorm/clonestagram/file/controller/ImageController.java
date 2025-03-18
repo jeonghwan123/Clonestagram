@@ -1,8 +1,8 @@
-package com.goorm.clonestagram.upload.controller;
+package com.goorm.clonestagram.file.controller;
 
-import com.goorm.clonestagram.upload.dto.ImageUploadReqDto;
-import com.goorm.clonestagram.upload.dto.ImageUploadResDto;
-import com.goorm.clonestagram.upload.service.ImageService;
+import com.goorm.clonestagram.file.dto.ImageUploadReqDto;
+import com.goorm.clonestagram.file.dto.ImageUploadResDto;
+import com.goorm.clonestagram.file.service.ImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

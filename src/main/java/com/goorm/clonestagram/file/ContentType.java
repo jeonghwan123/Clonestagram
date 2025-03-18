@@ -1,4 +1,4 @@
-package com.goorm.clonestagram.upload;
+package com.goorm.clonestagram.file;
 
 /**
  * Posts의 ContentType

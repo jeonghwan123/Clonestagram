@@ -1,7 +1,7 @@
-package com.goorm.clonestagram.upload.dto;
+package com.goorm.clonestagram.file.dto;
 
-import com.goorm.clonestagram.upload.ContentType;
-import com.goorm.clonestagram.upload.domain.Posts;
+import com.goorm.clonestagram.file.ContentType;
+import com.goorm.clonestagram.file.domain.Posts;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;

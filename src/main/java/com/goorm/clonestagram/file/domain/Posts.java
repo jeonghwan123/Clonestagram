@@ -1,6 +1,6 @@
-package com.goorm.clonestagram.upload.domain;
+package com.goorm.clonestagram.file.domain;
 
-import com.goorm.clonestagram.upload.ContentType;
+import com.goorm.clonestagram.file.ContentType;
 import jakarta.persistence.*;
 import lombok.*;
 
