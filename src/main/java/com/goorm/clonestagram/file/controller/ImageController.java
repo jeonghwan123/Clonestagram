@@ -1,13 +1,14 @@
 package com.goorm.clonestagram.file.controller;
 
+import com.goorm.clonestagram.file.dto.ImageUpdateReqDto;
+import com.goorm.clonestagram.file.dto.ImageUpdateResDto;
 import com.goorm.clonestagram.file.dto.ImageUploadReqDto;
 import com.goorm.clonestagram.file.dto.ImageUploadResDto;
 import com.goorm.clonestagram.file.service.ImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 이미지 업로드 요청을 처리하는 컨트롤러
@@ -42,5 +43,24 @@ public class ImageController {
 
         // 3. 검증이 통과된 경우 서비스 계층 호출 및 응답 반환
         return ResponseEntity.ok(imageService.imageUpload(imageUploadReqDto/*, loginUser.getId()*/));
+    }
+
+    /**
+     * 이미지 수정
+     * - 요청으로 부터 파일, 게시글 내용을 받아 유효성 검사 후 서비스 계층에 넘김
+     * - 가능한 수정 방식 : 파일만 수정, 내용만 수정, 둘다 수정, 둘다 수정 안함
+     *
+     * @param postSeq 게시글의 고유 번호
+     * @param imageUpdateReqDto
+     * @return
+     */
+    @PutMapping(value = "/image/{postSeq}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ImageUpdateResDto> imageUpdate(@PathVariable("postSeq") Long postSeq, ImageUpdateReqDto imageUpdateReqDto){
+
+        if(imageUpdateReqDto.getFile() != null && !imageUpdateReqDto.getFile().getContentType().startsWith("image/")){
+            throw new IllegalArgumentException("이미지를 업로드해 주세요");
+        }
+
+        return ResponseEntity.ok(imageService.imageUpdate(postSeq, imageUpdateReqDto));
     }
 }
