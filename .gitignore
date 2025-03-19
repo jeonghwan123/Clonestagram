@@ -37,4 +37,4 @@ out/
 .vscode/
 
 ### image/video ###
-/src/main/resources/static/uploads/*
+/uploads/image/*
