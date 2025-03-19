@@ -63,4 +63,19 @@ public class ImageController {
 
         return ResponseEntity.ok(imageService.imageUpdate(postSeq, imageUpdateReqDto));
     }
+
+    /**
+     * 이미지 삭제
+     * - 삭제를 원하는 게시글의 식별자를 받아 서비스 계층에 넘김
+     *
+     * @param postSeq 삭제할 게시글 식별자
+     * @return ResponseEntity
+     */
+    @DeleteMapping("/image/{postSeq}")
+    public ResponseEntity<?> imageDelete(@PathVariable Long postSeq){
+
+        imageService.imageDelete(postSeq);
+
+        return ResponseEntity.ok("삭제 완료");
+    }
 }
