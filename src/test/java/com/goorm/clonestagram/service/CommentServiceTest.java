@@ -2,6 +2,8 @@ package com.goorm.clonestagram.service;
 
 import com.goorm.clonestagram.entity.CommentEntity;
 import com.goorm.clonestagram.entity.CommentRepository;
+import com.goorm.clonestagram.entity.PostRepository;
+import com.goorm.clonestagram.entity.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +22,12 @@ class CommentServiceTest {
 
     @Mock
     private CommentRepository commentRepository;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private PostRepository postRepository;
 
     @InjectMocks
     private CommentService commentService;
@@ -55,6 +63,50 @@ class CommentServiceTest {
         // Verify: commentRepository.save()가 1번 호출되었는지 확인
         verify(commentRepository, times(1)).save(any(CommentEntity.class));
     }
+
+    /**
+     * ✅ 존재하지 않는 userId로 댓글 작성 테스트
+     */
+    @Test
+    void createComment_ShouldThrowException_WhenUserDoesNotExist() {
+        // Given: 모든 userId에 대해 false 반환
+        when(userRepository.existsById(anyLong())).thenReturn(false);
+
+        // When & Then: 예외 발생 여부 확인
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> commentService.createComment(mockComment));
+
+        // 예외 메시지 검증
+        assertTrue(exception.getMessage().contains("존재하지 않는 사용자 ID입니다"));
+
+        // Verify: userRepository.existsById()가 1번 호출되었는지 확인
+        verify(userRepository, times(1)).existsById(anyLong());
+        // Verify: commentRepository.save()가 호출되지 않았는지 확인
+        verify(commentRepository, never()).save(any(CommentEntity.class));
+    }
+
+    /**
+     * ✅ 존재하지 않는 postId로 댓글 작성 테스트
+     */
+    @Test
+    void createComment_ShouldThrowException_WhenPostDoesNotExist() {
+        // Given: 특정 postId (mockComment의 postId)에 대해 false 반환 (게시글이 존재하지 않도록 설정)
+        when(userRepository.existsById(anyLong())).thenReturn(true);
+        when(postRepository.existsById(mockComment.getPostId())).thenReturn(false);
+
+        // When & Then: 예외 발생 여부 확인
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> commentService.createComment(mockComment));
+
+        // 예외 메시지 검증
+        assertTrue(exception.getMessage().contains("존재하지 않는 게시글 ID입니다"));
+
+        // Verify: postRepository.existsById()가 1번 호출되었는지 확인
+        verify(postRepository, times(1)).existsById(mockComment.getPostId());
+        // Verify: commentRepository.save()가 호출되지 않았는지 확인
+        verify(commentRepository, never()).save(any(CommentEntity.class));
+    }
+
 
     /**
      * ✅ 존재하는 댓글을 조회하는 테스트
