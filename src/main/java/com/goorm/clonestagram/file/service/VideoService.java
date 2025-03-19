@@ -15,6 +15,10 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * 영상 업로드 요청을 처리하는 서비스
+ * - 검증이 완료된 영상을 받아 업로드 서비스 수행
+ */
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -25,6 +29,16 @@ public class VideoService {
     @Value("${video.path}")
     private String uploadFolder;
 
+    /**
+     * 영상 업로드
+     * - 검증이 끝난 파일의 name과 path를 설정하여 DB와 저장소에 저장
+     *
+     * @param videoUploadReqDto 업로드할 영상과 관련된 요청 DTO
+     *          - controller에서 넘어옴
+     * @return 성공시 ImageUploadResDto 반환
+     * @throws Exception
+     *          - 파일 저장시 IOException 발생
+     */
     public VideoUploadResDto videoUpload(VideoUploadReqDto videoUploadReqDto) {
         //1. unique 파일명을 생성하기 위해 uuid 사용
         UUID uuid = UUID.randomUUID();
@@ -53,6 +67,13 @@ public class VideoService {
                 .build();
     }
 
+    /**
+     *
+     * @param postSeq 게시글 ID
+     * @param videoUpdateReqDto 수정할 게시글과 관련된 요청 DTO
+     * @return 성공시 ImageUpdateResDto
+     * @exception IllegalArgumentException 게시글을 찾을 수 없을시 발생
+     */
     public VideoUpdateResDto videoUpdate(Long postSeq, VideoUpdateReqDto videoUpdateReqDto) {
 
         boolean updated = false;
@@ -60,7 +81,7 @@ public class VideoService {
         Posts posts = postsRepository.findById(postSeq)
                 .orElseThrow(() -> new IllegalArgumentException("게시물을 찾을 수 없습니다"));
 
-        //2. 이미지 수정 여부 파악
+        //2. 영상 수정 여부 파악
         if(videoUpdateReqDto.getFile() != null && !videoUpdateReqDto.getFile().isEmpty()){
 
             //2-1. unique 파일명을 생성하기 위해 uuid 사용
