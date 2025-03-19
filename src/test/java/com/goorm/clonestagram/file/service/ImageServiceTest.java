@@ -2,9 +2,11 @@ package com.goorm.clonestagram.file.service;
 
 import com.goorm.clonestagram.file.domain.Posts;
 import com.goorm.clonestagram.file.dto.ImageUploadReqDto;
+import com.goorm.clonestagram.file.dto.ImageUploadResDto;
 import com.goorm.clonestagram.file.repository.PostsRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.mock.web.MockMultipartFile;
@@ -17,6 +19,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class ImageServiceTest {
@@ -27,6 +30,9 @@ class ImageServiceTest {
 
     @Mock
     private PostsRepository postsRepository;
+
+    @InjectMocks
+    private ImageService imageService;
 
     @BeforeEach
     void setUp(){
@@ -54,7 +60,7 @@ class ImageServiceTest {
     }
 
     @Test
-    public void 생성완료테스트(){
+    public void 생성완료테스트() throws Exception{
         String uploadFolder = "src/main/resources/static/uploads/";
 
         MockMultipartFile mockMultipartFile = new MockMultipartFile(
@@ -73,8 +79,11 @@ class ImageServiceTest {
         Posts postImage = imageUploadReqDto.toEntity(imageFileName);
 
         when(postsRepository.save(any(Posts.class))).thenReturn(postImage);
-        Posts post = postsRepository.save(postImage);
-        assertTrue(post.getMediaName().equals(imageFileName));
+        ImageUploadResDto imageUploadResDto = imageService.imageUpload(imageUploadReqDto);
+
+        assertNotNull(imageUploadResDto);
+        assertNotNull(imageUploadResDto.getCreatedAt());
+        verify(postsRepository).save(any(Posts.class));
     }
 
 
