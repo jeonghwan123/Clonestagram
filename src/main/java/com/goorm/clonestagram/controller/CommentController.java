@@ -1,12 +1,15 @@
 package com.goorm.clonestagram.controller;
 
-import com.goorm.clonestagram.controller.model.CommentRequest;
-import com.goorm.clonestagram.controller.model.CommentResponse;
-import com.goorm.clonestagram.entity.CommentEntity;
+import com.goorm.clonestagram.dto.CommentRequest;
+import com.goorm.clonestagram.dto.CommentResponse;
+import com.goorm.clonestagram.domain.CommentEntity;
 import com.goorm.clonestagram.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -21,7 +24,7 @@ public class CommentController {
         return "Welcome to Clonestagram!";
     }
 
-    @GetMapping("post/{id}")
+    @GetMapping("/post/{id}")
     public CommentResponse getCommentById(@PathVariable Long id){
         CommentEntity entity = commentService.getCommentById(id);
 
@@ -35,6 +38,24 @@ public class CommentController {
                 .build();
 
     }
+
+    @GetMapping("/post/{postId}")
+    public List<CommentResponse> getCommentsByPostId(@PathVariable Long postId) {
+        List<CommentEntity> entities = commentService.getCommentsByPostId(postId);
+
+        // ✅ List<CommentEntity> → List<CommentResponse> 변환
+        return entities.stream()
+                .map(entity -> CommentResponse.builder()
+                        .id(entity.getId())
+                        .userId(entity.getUserId())
+                        .postId(entity.getPostId())
+                        .content(entity.getContent())
+                        .createdAt(entity.getCreatedAt())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+
 
     @PostMapping
     public CommentResponse create(@RequestBody CommentRequest request) throws Exception{

@@ -1,9 +1,9 @@
 package com.goorm.clonestagram.service;
 
-import com.goorm.clonestagram.entity.CommentEntity;
-import com.goorm.clonestagram.entity.CommentRepository;
-import com.goorm.clonestagram.entity.PostRepository;
-import com.goorm.clonestagram.entity.UserRepository;
+import com.goorm.clonestagram.domain.CommentEntity;
+import com.goorm.clonestagram.repository.CommentRepository;
+import com.goorm.clonestagram.repository.PostRepository;
+import com.goorm.clonestagram.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,6 +12,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import com.goorm.clonestagram.util.CustomTestLogger;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,6 +32,8 @@ class CommentServiceTest {
     @Mock
     private PostRepository postRepository;
 
+    private List<CommentEntity> mockComments;
+
     @InjectMocks
     private CommentService commentService;
 
@@ -42,6 +47,21 @@ class CommentServiceTest {
                 .postId(200L)
                 .content("Test Comment")
                 .build();
+
+        mockComments = Arrays.asList(
+                CommentEntity.builder()
+                        .id(1L)
+                        .postId(100L)
+                        .userId(1L)
+                        .content("첫 번째 댓글")
+                        .build(),
+                CommentEntity.builder()
+                        .id(2L)
+                        .postId(100L)
+                        .userId(2L)
+                        .content("두 번째 댓글")
+                        .build()
+        );
     }
 
     /**
@@ -128,6 +148,28 @@ class CommentServiceTest {
         verify(commentRepository, times(1)).findById(1L);
     }
 
+
+    /**
+     * ✅ 존재하는 댓글을 조회하는 테스트
+     */
+    @Test
+    void getCommentByPostId_ShouldReturnComment_WhenCommentExists() {
+        // Given: 특정 ID로 조회할 때 mockComment 반환
+        when(commentRepository.findById(1L)).thenReturn(Optional.of(mockComment));
+
+        // When: 댓글을 ID로 조회
+        CommentEntity foundComment = commentService.getCommentById(1L);
+
+        // Then: 댓글이 정상적으로 조회되는지 확인
+        assertNotNull(foundComment);
+        assertEquals(1L, foundComment.getId());
+        assertEquals("Test Comment", foundComment.getContent());
+
+        // Verify: commentRepository.findById()가 1번 호출되었는지 확인
+        verify(commentRepository, times(1)).findById(1L);
+    }
+
+
     /**
      * ✅ 존재하지 않는 댓글을 조회할 때 예외 발생하는지 테스트
      */
@@ -149,4 +191,68 @@ class CommentServiceTest {
         // Verify: findById()가 1번 호출되었는지 확인
         verify(commentRepository, times(1)).findById(999L);
     }
+
+    /**
+     * ✅ postId로 모든 댓글을 조회할 때 리스트가 반환되는지 테스트
+     */
+    @Test
+    void getCommentsByPostId_ShouldReturnListOfComments() {
+        // Given: postId=100에 대한 댓글 목록을 반환하도록 설정
+        when(commentRepository.findByPostId(100L)).thenReturn(mockComments);
+
+        // When: postId=100으로 댓글 목록 조회
+        List<CommentEntity> comments = commentService.getCommentsByPostId(100L);
+
+        // Then: 반환된 리스트가 예상대로 존재하는지 확인
+        assertNotNull(comments);
+        assertEquals(2, comments.size()); // 댓글 2개여야 함
+        assertEquals("첫 번째 댓글", comments.get(0).getContent());
+        assertEquals("두 번째 댓글", comments.get(1).getContent());
+
+        // Verify: commentRepository.findByPostId()가 1번 호출되었는지 확인
+        verify(commentRepository, times(1)).findByPostId(100L);
+    }
+
+    @Test
+    void getCommentsByPostId_ShouldThrowException_WhenPostDoesNotExist() {
+        // Given: postId=999L는 존재하지 않음
+        when(postRepository.existsById(999L)).thenReturn(false);
+
+        // When & Then: 예외 발생 여부 확인
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> commentService.getCommentsByPostId(999L));
+
+        System.out.println("🚨 발생한 예외 메시지: " + exception.getMessage());
+
+        // 예외 메시지 검증
+        assertEquals("존재하지 않는 게시글 ID입니다: 999", exception.getMessage());
+
+        // Verify: postRepository.existsById()가 1번 호출되었는지 확인
+        verify(postRepository, times(1)).existsById(999L);
+        // Verify: commentRepository.findByPostId()가 호출되지 않았는지 확인
+        verify(commentRepository, never()).findByPostId(anyLong());
+    }
+
+    @Test
+    void getCommentsByPostId_ShouldThrowException_WhenNoCommentsExist() {
+        // Given: postId=100은 존재하지만, 해당 게시글에 댓글이 없음
+        when(postRepository.existsById(100L)).thenReturn(true);
+        when(commentRepository.findByPostId(100L)).thenReturn(Collections.emptyList());
+
+        // When & Then: 예외 발생 여부 확인
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> commentService.getCommentsByPostId(100L));
+
+        System.out.println("🚨 발생한 예외 메시지: " + exception.getMessage());
+
+        // 예외 메시지 검증
+        assertEquals("해당 게시글(100)에는 댓글이 없습니다.", exception.getMessage());
+
+        // Verify: postRepository.existsById()가 1번 호출되었는지 확인
+        verify(postRepository, times(1)).existsById(100L);
+        // Verify: commentRepository.findByPostId()가 1번 호출되었는지 확인
+        verify(commentRepository, times(1)).findByPostId(100L);
+    }
+
+
 }

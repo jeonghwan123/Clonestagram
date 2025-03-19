@@ -1,4 +1,4 @@
-package com.goorm.clonestagram.controller.model;
+package com.goorm.clonestagram.dto;
 
 import lombok.Getter;
 
