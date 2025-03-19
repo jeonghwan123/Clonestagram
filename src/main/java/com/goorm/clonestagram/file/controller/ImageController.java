@@ -45,6 +45,15 @@ public class ImageController {
         return ResponseEntity.ok(imageService.imageUpload(imageUploadReqDto/*, loginUser.getId()*/));
     }
 
+    /**
+     * 이미지 수정
+     * - 요청으로 부터 파일, 게시글 내용을 받아 유효성 검사 후 서비스 계층에 넘김
+     * - 가능한 수정 방식 : 파일만 수정, 내용만 수정, 둘다 수정, 둘다 수정 안함
+     *
+     * @param postSeq 게시글의 고유 번호
+     * @param imageUpdateReqDto
+     * @return
+     */
     @PutMapping(value = "/image/{postSeq}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ImageUpdateResDto> imageUpdate(@PathVariable("postSeq") Long postSeq, ImageUpdateReqDto imageUpdateReqDto){
 
