@@ -45,7 +45,7 @@ public class ImageService {
         String imageFileName = uuid + "_" + imageUploadReqDto.getFile().getOriginalFilename();
 
         //2. unique 파일명과 upload 위치를 활용해 파일 경로 생성
-        Path imageFilePath = Paths.get(uploadFolder + imageFileName);
+        Path imageFilePath = Paths.get(uploadFolder).resolve(imageFileName);
 
         try{
             //3. 파일 경로를 활용해 디렉토리를 생성하고 파일을 저장
