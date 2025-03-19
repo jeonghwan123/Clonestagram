@@ -1,10 +1,9 @@
 package com.goorm.clonestagram.repository;
 
-import com.goorm.clonestagram.domain.CommentEntity;
+import com.goorm.clonestagram.domain.PostEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
-public interface PostRepository extends JpaRepository<CommentEntity, Long> {
-
+@Repository
+public interface PostRepository extends JpaRepository<PostEntity, Long> {
 }

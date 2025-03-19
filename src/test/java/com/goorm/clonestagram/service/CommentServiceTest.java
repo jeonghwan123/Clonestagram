@@ -1,6 +1,7 @@
 package com.goorm.clonestagram.service;
 
 import com.goorm.clonestagram.domain.CommentEntity;
+import com.goorm.clonestagram.domain.PostEntity;
 import com.goorm.clonestagram.repository.CommentRepository;
 import com.goorm.clonestagram.repository.PostRepository;
 import com.goorm.clonestagram.repository.UserRepository;
@@ -12,6 +13,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import com.goorm.clonestagram.util.CustomTestLogger;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -39,11 +42,14 @@ class CommentServiceTest {
 
     private CommentEntity mockComment;
 
+    private PostEntity mockPost;
+
+
     @BeforeEach
     void setUp() {
         mockComment = CommentEntity.builder()
                 .id(1L)
-                .userId(100L)
+                .userId(5L)
                 .postId(200L)
                 .content("Test Comment")
                 .build();
@@ -62,6 +68,8 @@ class CommentServiceTest {
                         .content("두 번째 댓글")
                         .build()
         );
+
+        mockPost = new PostEntity(200L, 5L, "Test Post");
     }
 
     /**
@@ -254,5 +262,80 @@ class CommentServiceTest {
         verify(commentRepository, times(1)).findByPostId(100L);
     }
 
+
+    /**
+     * ✅ 댓글 작성자가 삭제하는 경우 (정상 삭제)
+     */
+    @Test
+    void removeComment_ShouldDeleteComment_WhenRequesterIsCommentOwner() {
+        // ✅ doReturn().when() 사용하여 더 유연한 stubbing 적용
+        doReturn(Optional.of(mockComment)).when(commentRepository).findById(1L);
+        doReturn(Optional.of(mockPost)).when(postRepository).findById(200L);
+
+        // When: 댓글 삭제 요청
+        commentService.removeComment(1L, 5L);
+
+        // Then: 댓글 삭제가 정상적으로 수행됨
+        verify(commentRepository, times(1)).deleteById(1L);
+    }
+
+
+    /**
+     * ✅ 게시글 작성자가 댓글을 삭제하는 경우 (정상 삭제)
+     */
+    @Test
+    void removeComment_ShouldDeleteComment_WhenRequesterIsPostOwner() {
+        // Given: 댓글과 게시글이 존재하고, 요청자가 게시글 작성자임
+        doReturn(Optional.of(mockComment)).when(commentRepository).findById(1L);
+        doReturn(Optional.of(mockPost)).when(postRepository).findById(200L);
+
+
+        // When: 게시글 작성자가 댓글 삭제 요청
+        commentService.removeComment(1L, 10L);
+
+        // Then: 댓글 삭제가 정상적으로 수행됨
+        verify(commentRepository, times(1)).deleteById(1L);
+    }
+
+    /**
+     * ✅ 권한이 없는 사용자가 삭제하려고 하면 예외 발생
+     */
+    @Test
+    void removeComment_ShouldThrowException_WhenRequesterHasNoPermission() {
+        // Given: 댓글과 게시글이 존재하지만 요청자가 댓글/게시글 작성자가 아님
+        doReturn(Optional.of(mockComment)).when(commentRepository).findById(1L);
+        doReturn(Optional.of(mockPost)).when(postRepository).findById(200L);
+
+        // When & Then: 예외 발생 확인 (잘못된 요청자 ID: 999L)
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            commentService.removeComment(1L, 999L);
+        });
+
+        // 예외 메시지 검증
+        assertTrue(exception.getMessage().contains("댓글을 삭제할 권한이 없습니다"));
+
+        // 댓글 삭제가 호출되지 않아야 함
+        verify(commentRepository, never()).deleteById(1L);
+    }
+
+    /**
+     * ✅ 존재하지 않는 댓글을 삭제하려고 하면 예외 발생
+     */
+    @Test
+    void removeComment_ShouldThrowException_WhenCommentDoesNotExist() {
+        // Given: 댓글이 존재하지 않음
+        when(commentRepository.findById(999L)).thenReturn(Optional.empty());
+
+        // When & Then: 예외 발생 확인
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            commentService.removeComment(999L, 5L);
+        });
+
+        // 예외 메시지 검증
+        assertTrue(exception.getMessage().contains("존재하지 않는 댓글 ID입니다"));
+
+        // 댓글 삭제가 호출되지 않아야 함
+        verify(commentRepository, never()).deleteById(999L);
+    }
 
 }

@@ -77,7 +77,11 @@ public class CommentController {
                 .createdAt(entity.getCreatedAt())
                 .build();
 
+    }
 
-
+    @DeleteMapping("/{commentId}")
+    public String deleteComment(@PathVariable Long commentId, @RequestParam Long requesterId) {
+        commentService.removeComment(commentId, requesterId);
+        return "댓글이 삭제되었습니다. ID: " + commentId;
     }
 }
