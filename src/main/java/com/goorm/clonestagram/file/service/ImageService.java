@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -24,6 +25,7 @@ import java.util.UUID;
  */
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ImageService {
 
@@ -146,5 +148,26 @@ public class ImageService {
                 .type(updatedPost.getContentType())
                 .updatedAt(updatedPost.getUpdatedAt())
                 .build();
+    }
+
+    /**
+     *
+     * @param postSeq 삭제할 게시글 식별자
+     */
+    public void imageDelete(Long postSeq) {
+        //1. 식별자를 토대로 게시글 찾아 반환
+        Posts posts = postsRepository.findById(postSeq)
+                        .orElseThrow(() -> new IllegalArgumentException("해당 게시물이 없습니다"));
+
+        //2. 기존에 존재하던 파일 삭제
+        Path filePath = Paths.get(uploadFolder).resolve(posts.getMediaName());
+        try{
+            Files.deleteIfExists(filePath);
+        } catch (IOException e){
+            throw new RuntimeException("파일 삭제 중 오류 발생 : " + e.getMessage());
+        }
+
+        //3. DB에서 데이터 삭제
+        postsRepository.delete(posts);
     }
 }
