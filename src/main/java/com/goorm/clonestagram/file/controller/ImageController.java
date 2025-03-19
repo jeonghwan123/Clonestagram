@@ -1,13 +1,14 @@
 package com.goorm.clonestagram.file.controller;
 
+import com.goorm.clonestagram.file.dto.ImageUpdateReqDto;
+import com.goorm.clonestagram.file.dto.ImageUpdateResDto;
 import com.goorm.clonestagram.file.dto.ImageUploadReqDto;
 import com.goorm.clonestagram.file.dto.ImageUploadResDto;
 import com.goorm.clonestagram.file.service.ImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 이미지 업로드 요청을 처리하는 컨트롤러
@@ -42,5 +43,15 @@ public class ImageController {
 
         // 3. 검증이 통과된 경우 서비스 계층 호출 및 응답 반환
         return ResponseEntity.ok(imageService.imageUpload(imageUploadReqDto/*, loginUser.getId()*/));
+    }
+
+    @PutMapping(value = "/image/{postSeq}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ImageUpdateResDto> imageUpdate(@PathVariable("postSeq") Long postSeq, ImageUpdateReqDto imageUpdateReqDto){
+
+        if(imageUpdateReqDto.getFile() != null && !imageUpdateReqDto.getFile().getContentType().startsWith("image/")){
+            throw new IllegalArgumentException("이미지를 업로드해 주세요");
+        }
+
+        return ResponseEntity.ok(imageService.imageUpdate(postSeq, imageUpdateReqDto));
     }
 }
