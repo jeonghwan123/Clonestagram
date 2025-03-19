@@ -1,4 +1,4 @@
-package com.goorm.clonestagram.file.dto;
+package com.goorm.clonestagram.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

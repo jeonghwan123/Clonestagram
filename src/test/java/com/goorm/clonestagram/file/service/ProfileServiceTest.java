@@ -1,7 +1,7 @@
 package com.goorm.clonestagram.file.service;
 
-import com.goorm.clonestagram.file.domain.user.User;
-import com.goorm.clonestagram.file.repository.UserRepository;
+import com.goorm.clonestagram.user.domain.User;
+import com.goorm.clonestagram.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

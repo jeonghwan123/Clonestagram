@@ -1,11 +1,12 @@
-package com.goorm.clonestagram.file.service;
+package com.goorm.clonestagram.user.service;
 
-import com.goorm.clonestagram.file.domain.user.User;
+import com.goorm.clonestagram.file.service.ImageService;
+import com.goorm.clonestagram.user.domain.User;
 import com.goorm.clonestagram.file.dto.ImageUploadReqDto;
 import com.goorm.clonestagram.file.dto.ImageUploadResDto;
-import com.goorm.clonestagram.file.dto.UserProfileDto;
-import com.goorm.clonestagram.file.dto.UserProfileUpdateDto;
-import com.goorm.clonestagram.file.repository.UserRepository;
+import com.goorm.clonestagram.user.dto.UserProfileDto;
+import com.goorm.clonestagram.user.dto.UserProfileUpdateDto;
+import com.goorm.clonestagram.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

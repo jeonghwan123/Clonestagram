@@ -1,6 +1,6 @@
-package com.goorm.clonestagram.file.repository;
+package com.goorm.clonestagram.user.repository;
 
-import com.goorm.clonestagram.file.domain.user.User;
+import com.goorm.clonestagram.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

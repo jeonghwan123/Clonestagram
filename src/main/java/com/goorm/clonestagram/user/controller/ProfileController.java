@@ -1,9 +1,9 @@
-package com.goorm.clonestagram.file.controller;
+package com.goorm.clonestagram.user.controller;
 
-import com.goorm.clonestagram.file.domain.user.User;
-import com.goorm.clonestagram.file.dto.UserProfileDto;
-import com.goorm.clonestagram.file.dto.UserProfileUpdateDto;
-import com.goorm.clonestagram.file.service.ProfileService;
+import com.goorm.clonestagram.user.domain.User;
+import com.goorm.clonestagram.user.dto.UserProfileDto;
+import com.goorm.clonestagram.user.dto.UserProfileUpdateDto;
+import com.goorm.clonestagram.user.service.ProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
