@@ -39,4 +39,13 @@ public class FeedController {
         return ResponseEntity.ok(feedService.getAllFeed(pageable));
     }
 
+    //Todo TempUserDetail 변경
+    @GetMapping("/feeds/follow")
+    public ResponseEntity<FeedResDto> followFeed(@AuthenticationPrincipal TempUserDetail userDetail,
+                                                 @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)Pageable pageable
+    ){
+        Long userId = userDetail.getId();
+
+        return ResponseEntity.ok(feedService.getFollowFeed(userId, pageable));
+    }
 }
