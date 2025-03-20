@@ -2,6 +2,7 @@ package com.goorm.clonestagram.file.dto;
 
 import com.goorm.clonestagram.file.ContentType;
 import com.goorm.clonestagram.file.domain.Posts;
+import com.goorm.clonestagram.user.domain.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,13 +23,12 @@ public class VideoUploadReqDto {
     private MultipartFile file;
     private String content;
 
-    public Posts toEntity(String imageName /*, User userEntity*/) {
+    public Posts toEntity(String imageName , User user) {
         return Posts.builder()
-//                    .user(userEntity)
+                .user(user)
                 .content(content)
                 .mediaName(imageName)
                 .contentType(ContentType.VIDEO)
-                .createdAt(LocalDateTime.now())
                 .build();
     }
 }
