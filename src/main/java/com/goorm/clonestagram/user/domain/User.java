@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
+@Table(name = "users")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -27,7 +28,7 @@ public class User extends BaseTimeEntity { // BaseTimeEntity를 상속받아 cre
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "userId")
+    @Column(name = "id")
     private Long id;
 
     @Column(nullable = false, length = 20)
@@ -41,7 +42,7 @@ public class User extends BaseTimeEntity { // BaseTimeEntity를 상속받아 cre
     private String email;
 
     @Lob // 큰 데이터를 저장하기 위해 사용
-    @Column(columnDefinition = "TEXT") // 이미지의 경로(url)을 받기 위함
+    @Column(name = "profile_img", columnDefinition = "TEXT") // 이미지의 경로(url)을 받기 위함
     private String profileimg;
 
     @Column(columnDefinition = "TEXT")
