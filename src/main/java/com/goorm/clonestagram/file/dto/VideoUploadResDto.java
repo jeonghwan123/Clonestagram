@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class VideoUploadResDto {
-    //    private User user;
     private String content;
     private ContentType type;
     private LocalDateTime createdAt;
