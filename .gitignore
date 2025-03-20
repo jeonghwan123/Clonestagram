@@ -38,3 +38,6 @@ out/
 
 ### image/video ###
 /uploads/image/*
+
+### db 설정 파일 ###
+/src/main/resources/application-db.properties
