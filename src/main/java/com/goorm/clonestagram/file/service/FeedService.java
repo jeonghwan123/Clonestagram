@@ -46,4 +46,26 @@ public class FeedService {
                 .build();
     }
 
+    public FeedResDto getFollowFeed(Long userId, Pageable pageable) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("userId = " + userId + " 인 유저가 존재하지 않습니다"));
+
+
+//        Map<Long, Page<Posts>> followFeedMap = new HashMap<>();
+//
+//        List<Follow> followList = user.getFollowing();
+//        for (Follow follow : followList) {
+//            Long followingId = follow.getToUser().getId();
+//            Page<Posts> posts = postsRepository.findAllByUserId(followingId, pageable);
+//            followFeedMap.put(followingId, posts);  // 유저별로 페이지 저장
+//        }
+
+        List<Long> followList = userRepository.findFollowingUserIdsByFromUserId(user.getId());
+        Page<Posts> postsLists = postsRepository.findAllByUserIdIn(followList, pageable);
+
+        return FeedResDto.builder()
+                .user(UserProfileDto.fromEntity(user))
+                .feed(postsLists.map(PostInfoDto::fromEntity))
+                .build();
+    }
 }
