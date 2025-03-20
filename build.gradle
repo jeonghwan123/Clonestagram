@@ -37,12 +37,26 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
     //security
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    //MariaDB
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    //mockito
+    testImplementation 'org.mockito:mockito-inline:5.2.0'
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    implementation 'io.github.cdimascio:dotenv-java:3.0.0'
+
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+
+    testLogging {
+        events "passed", "failed", "skipped"
+        showStandardStreams = true
+        exceptionFormat = 'full'
+    }
 }
