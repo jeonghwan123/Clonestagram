@@ -37,4 +37,13 @@ public class FeedService {
                 .build();
     }
 
+    public FeedResDto getAllFeed(Pageable pageable) {
+        Page<Posts> myFeed = postsRepository.findAll(pageable);
+
+        return FeedResDto.builder()
+                .user(null)
+                .feed(myFeed.map(PostInfoDto::fromEntity))
+                .build();
+    }
+
 }
