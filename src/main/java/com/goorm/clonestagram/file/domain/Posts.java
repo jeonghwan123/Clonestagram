@@ -1,6 +1,8 @@
 package com.goorm.clonestagram.file.domain;
 
+import com.goorm.clonestagram.common.base.BaseTimeEntity;
 import com.goorm.clonestagram.file.ContentType;
+import com.goorm.clonestagram.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,7 +19,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "posts")
-public class Posts {
+public class Posts extends BaseTimeEntity {
 
     /**
      * 게시물 Primary Key
@@ -28,10 +30,9 @@ public class Posts {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-       /** User 객체 대기 **/
-//    @ManyToOne
-//    @Column(name = "user_id", nullable = false)
-//    private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     /**
      * 게시물 내용
@@ -70,4 +71,15 @@ public class Posts {
      */
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
 }
