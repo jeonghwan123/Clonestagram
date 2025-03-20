@@ -1,4 +1,4 @@
-package com.goorm.clonestagram.user.domain;
+package com.goorm.clonestagram.common.base;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;

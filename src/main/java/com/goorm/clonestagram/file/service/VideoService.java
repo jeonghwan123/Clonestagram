@@ -3,6 +3,8 @@ package com.goorm.clonestagram.file.service;
 import com.goorm.clonestagram.file.domain.Posts;
 import com.goorm.clonestagram.file.dto.*;
 import com.goorm.clonestagram.file.repository.PostsRepository;
+import com.goorm.clonestagram.user.domain.User;
+import com.goorm.clonestagram.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -12,7 +14,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -25,6 +26,7 @@ import java.util.UUID;
 public class VideoService {
 
     private final PostsRepository postsRepository;
+    private final UserRepository userRepository;
 
     @Value("${video.path}")
     private String uploadFolder;
@@ -39,7 +41,11 @@ public class VideoService {
      * @throws Exception
      *          - 파일 저장시 IOException 발생
      */
-    public VideoUploadResDto videoUpload(VideoUploadReqDto videoUploadReqDto) {
+    public VideoUploadResDto videoUpload(VideoUploadReqDto videoUploadReqDto, Long userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
+
         //1. unique 파일명을 생성하기 위해 uuid 사용
         UUID uuid = UUID.randomUUID();
         String videoFileName = uuid + "_" + videoUploadReqDto.getFile().getOriginalFilename();
@@ -56,7 +62,7 @@ public class VideoService {
         }
 
         //4. unique 파일명과 videoUploadReqDto의 값들을 활용해 Entity 객체 생성 후 저장
-        Posts postEntity = videoUploadReqDto.toEntity(videoFileName);
+        Posts postEntity = videoUploadReqDto.toEntity(videoFileName, user);
         Posts post = postsRepository.save(postEntity);
 
         //5. 모든 작업이 완료된 경우 응답 반환
@@ -74,12 +80,16 @@ public class VideoService {
      * @return 성공시 ImageUpdateResDto
      * @exception IllegalArgumentException 게시글을 찾을 수 없을시 발생
      */
-    public VideoUpdateResDto videoUpdate(Long postSeq, VideoUpdateReqDto videoUpdateReqDto) {
+    public VideoUpdateResDto videoUpdate(Long postSeq, VideoUpdateReqDto videoUpdateReqDto, Long userId) {
 
         boolean updated = false;
         //1. 게시글 ID를 통해 게시글을 찾아 반환
         Posts posts = postsRepository.findById(postSeq)
                 .orElseThrow(() -> new IllegalArgumentException("게시물을 찾을 수 없습니다"));
+
+        if(!posts.getUser().getId().equals(userId)){
+            throw new IllegalArgumentException("권한이 없는 유저입니다");
+        }
 
         //2. 영상 수정 여부 파악
         if(videoUpdateReqDto.getFile() != null && !videoUpdateReqDto.getFile().isEmpty()){
@@ -102,7 +112,7 @@ public class VideoService {
             posts.setMediaName(videoFileName);
 
             //2-5. 기존의 파일 삭제
-            Path oldVideoPath = Paths.get(uploadFolder + oldFileName);
+            Path oldVideoPath = Paths.get(uploadFolder).resolve(oldFileName);
             try{
                 Files.deleteIfExists(oldVideoPath);
             } catch (IOException e){
@@ -124,9 +134,6 @@ public class VideoService {
 
         Posts updatedPost;
         if(updated){
-            //4. 업데이트 된 경우 업데이트일시 반영
-            posts.setUpdatedAt(LocalDateTime.now());
-
             //5. 업데이트된 게시글을 DB에 저장
             updatedPost = postsRepository.save(posts);
         }else{
@@ -146,10 +153,14 @@ public class VideoService {
      *
      * @param postSeq 삭제할 게시글 식별자
      */
-    public void videoDelete(Long postSeq) {
+    public void videoDelete(Long postSeq, Long userId) {
         //1. 식별자를 토대로 게시글 찾아 반환
         Posts posts = postsRepository.findById(postSeq)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시물이 없습니다"));
+
+        if(!posts.getUser().getId().equals(userId)){
+            throw new IllegalArgumentException("권한이 없는 유저입니다");
+        }
 
         //2. 기존에 존재하던 파일 삭제
         Path filePath = Paths.get(uploadFolder).resolve(posts.getMediaName());
