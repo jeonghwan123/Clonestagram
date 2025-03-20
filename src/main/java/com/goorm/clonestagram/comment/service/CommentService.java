@@ -1,16 +1,13 @@
-package com.goorm.clonestagram.service;
-import com.goorm.clonestagram.domain.PostEntity;
-import com.goorm.clonestagram.domain.CommentEntity;
-import com.goorm.clonestagram.repository.CommentRepository;
-import com.goorm.clonestagram.repository.PostRepository;
-import com.goorm.clonestagram.repository.UserRepository;
+package com.goorm.clonestagram.comment.service;
+import com.goorm.clonestagram.comment.domain.CommentEntity;
+import com.goorm.clonestagram.file.domain.Posts;
+import com.goorm.clonestagram.file.repository.PostsRepository;
+import com.goorm.clonestagram.comment.repository.CommentRepository;
+import com.goorm.clonestagram.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -21,7 +18,7 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
-    private final PostRepository postRepository;
+    private final PostsRepository postsRepository;
 
 
     @Transactional
@@ -33,7 +30,7 @@ public class CommentService {
         }
 
         // ✅ postId가 존재하는지 확인
-        if (!postRepository.existsById(comment.getPostId())) {
+        if (!postsRepository.existsById(comment.getPostId())) {
             throw new IllegalArgumentException("존재하지 않는 게시글 ID입니다: " + comment.getPostId());
         }
 
@@ -57,7 +54,7 @@ public class CommentService {
     @Transactional(readOnly = true)
     public List<CommentEntity> getCommentsByPostId(Long postId) {
         // postId가 실제 존재하는지 확인
-        if (!postRepository.existsById(postId)) {
+        if (!postsRepository.existsById(postId)) {
             throw new IllegalArgumentException("존재하지 않는 게시글 ID입니다: " + postId);
         }
 
@@ -84,11 +81,11 @@ public class CommentService {
 
         // 2️⃣ 해당 댓글이 속한 게시글 조회 (✔ postId 사용)
         Long postId = comment.getPostId(); // ✅ comment에서 postId 가져오기
-        PostEntity post = postRepository.findById(postId) // ✅ postId 기반 조회
+        Posts post = postsRepository.findById(postId) // ✅ postId 기반 조회
                 .orElseThrow(() -> new IllegalArgumentException("댓글이 속한 게시글이 존재하지 않습니다. postId: " + postId));
 
         // 3️⃣ 댓글 삭제 권한 확인 (댓글 작성자 또는 게시글 작성자)
-        if (!comment.getUserId().equals(requesterId) && !post.getUserId().equals(requesterId)) {
+        if (!comment.getUserId().equals(requesterId) && !post.getUser().getId().equals(requesterId)) {
             throw new IllegalArgumentException("댓글을 삭제할 권한이 없습니다. 요청자 ID: " + requesterId);
         }
 

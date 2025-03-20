@@ -60,12 +60,13 @@ public class FeedService {
 //            followFeedMap.put(followingId, posts);  // 유저별로 페이지 저장
 //        }
 
-        List<Long> followList = userRepository.findFollowingUserIdsByFromUserId(user.getId());
-        Page<Posts> postsLists = postsRepository.findAllByUserIdIn(followList, pageable);
+        //Todo : Follow추가후 해제
+//        List<Long> followList = userRepository.findFollowingUserIdsByFromUserId(user.getId());
+//        Page<Posts> postsLists = postsRepository.findAllByUserIdIn(followList, pageable);
 
         return FeedResDto.builder()
                 .user(UserProfileDto.fromEntity(user))
-                .feed(postsLists.map(PostInfoDto::fromEntity))
+//                .feed(postsLists.map(PostInfoDto::fromEntity))
                 .build();
     }
 }

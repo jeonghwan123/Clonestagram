@@ -1,9 +1,9 @@
-package com.goorm.clonestagram.controller;
+package com.goorm.clonestagram.comment.controller;
 
-import com.goorm.clonestagram.dto.CommentRequest;
-import com.goorm.clonestagram.dto.CommentResponse;
-import com.goorm.clonestagram.domain.CommentEntity;
-import com.goorm.clonestagram.service.CommentService;
+import com.goorm.clonestagram.comment.dto.CommentRequest;
+import com.goorm.clonestagram.comment.dto.CommentResponse;
+import com.goorm.clonestagram.comment.domain.CommentEntity;
+import com.goorm.clonestagram.comment.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;

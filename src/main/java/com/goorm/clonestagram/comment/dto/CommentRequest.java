@@ -1,4 +1,4 @@
-package com.goorm.clonestagram.dto;
+package com.goorm.clonestagram.comment.dto;
 
 import lombok.Getter;
 

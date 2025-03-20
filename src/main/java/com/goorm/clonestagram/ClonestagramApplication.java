@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 
 @EnableJpaAuditing
-@EntityScan(basePackages = "com.goorm.clonestagram.domain") // ✅ Entity 패키지 스캔 설정
-@EnableJpaRepositories(basePackages = "com.goorm.clonestagram.repository") // ✅ Repository 패키지 스캔 설정
+@EntityScan(basePackages = "com.goorm.clonestagram") // ✅ Entity 패키지 스캔 설정
+@EnableJpaRepositories(basePackages = "com.goorm.clonestagram") // ✅ Repository 패키지 스캔 설정
 @SpringBootApplication
 public class ClonestagramApplication {
 
