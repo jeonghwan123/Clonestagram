@@ -1,6 +1,7 @@
 package com.goorm.clonestagram.user.domain;
 
 
+import com.goorm.clonestagram.common.base.BaseTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
