@@ -3,6 +3,11 @@ package com.goorm.clonestagram.service;
 import com.goorm.clonestagram.comment.domain.CommentEntity;
 import com.goorm.clonestagram.comment.service.CommentService;
 import com.goorm.clonestagram.comment.repository.CommentRepository;
+import com.goorm.clonestagram.file.ContentType;
+import com.goorm.clonestagram.file.domain.Posts;
+import com.goorm.clonestagram.file.repository.PostsRepository;
+import com.goorm.clonestagram.user.domain.User;
+import com.goorm.clonestagram.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +34,7 @@ class CommentServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private PostRepository postRepository;
+    private PostsRepository postRepository;
 
     private List<CommentEntity> mockComments;
 
@@ -38,7 +43,7 @@ class CommentServiceTest {
 
     private CommentEntity mockComment;
 
-    private PostEntity mockPost;
+    private Posts mockPost;
 
 
     @BeforeEach
@@ -64,8 +69,20 @@ class CommentServiceTest {
                         .content("두 번째 댓글")
                         .build()
         );
+        User mockUser = User.builder()
+                .id(5L)
+                .username("mockuser")
+                .password("mockpassword")
+                .email("mock@domain.com")
+                .build();
 
-        mockPost = new PostEntity(200L, 5L, "Test Post");
+        mockPost = Posts.builder()
+                .id(200L)
+                .user(mockUser)
+                .content("Test Post")
+                .mediaName("test.jpg")
+                .contentType(ContentType.IMAGE)
+                .build();
     }
 
     /**
@@ -201,6 +218,8 @@ class CommentServiceTest {
      */
     @Test
     void getCommentsByPostId_ShouldReturnListOfComments() {
+        when(postRepository.existsById(100L)).thenReturn(true);
+
         // Given: postId=100에 대한 댓글 목록을 반환하도록 설정
         when(commentRepository.findByPostId(100L)).thenReturn(mockComments);
 
@@ -287,7 +306,7 @@ class CommentServiceTest {
 
 
         // When: 게시글 작성자가 댓글 삭제 요청
-        commentService.removeComment(1L, 10L);
+        commentService.removeComment(1L, 5L);
 
         // Then: 댓글 삭제가 정상적으로 수행됨
         verify(commentRepository, times(1)).deleteById(1L);
