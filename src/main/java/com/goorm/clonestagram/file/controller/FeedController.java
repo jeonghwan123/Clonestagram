@@ -30,5 +30,13 @@ public class FeedController {
         return ResponseEntity.ok(feedService.getMyFeed(userId,pageable));
     }
 
+    //Todo TempUserDetail 변경
+    @GetMapping("/feeds/all")
+    public ResponseEntity<FeedResDto> allFeed(
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)Pageable pageable
+    ){
+
+        return ResponseEntity.ok(feedService.getAllFeed(pageable));
+    }
 
 }
