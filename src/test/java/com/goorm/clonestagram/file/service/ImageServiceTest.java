@@ -7,12 +7,15 @@ import com.goorm.clonestagram.file.dto.ImageUpdateResDto;
 import com.goorm.clonestagram.file.dto.ImageUploadReqDto;
 import com.goorm.clonestagram.file.dto.ImageUploadResDto;
 import com.goorm.clonestagram.file.repository.PostsRepository;
+import com.goorm.clonestagram.user.domain.User;
+import com.goorm.clonestagram.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,6 +31,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+//Todo 로그인 구현 완료 후 유저를 포함하여 테스트 필요
 class ImageServiceTest {
 
     private String uploadFolder = "src/main/resources/static/uploads/image";
@@ -37,6 +41,9 @@ class ImageServiceTest {
     @Mock
     private PostsRepository postsRepository;
 
+    @Mock
+    private UserRepository userRepository;
+
     @InjectMocks
     private ImageService imageService;
 
@@ -44,6 +51,7 @@ class ImageServiceTest {
     void setUp(){
         MockitoAnnotations.openMocks(this);
         imageUploadReqDto = new ImageUploadReqDto();
+        ReflectionTestUtils.setField(imageService, "uploadFolder", "uploads/image");
     }
 
     @Test
@@ -67,28 +75,28 @@ class ImageServiceTest {
 
     @Test
     public void 생성완료테스트() throws Exception{
-        String uploadFolder = "src/main/resources/static/uploads/";
-
         MockMultipartFile mockMultipartFile = new MockMultipartFile(
                 "file", "test-image.jpg","image/jpeg","dummy image content".getBytes()
         );
 
-        UUID uuid = UUID.randomUUID();
-        String imageFileName = uuid + "_" +mockMultipartFile.getOriginalFilename();
-        Path imageFilePath = Paths.get(uploadFolder + imageFileName);
-        try{
-            Files.createDirectories(Paths.get(uploadFolder));
-            Files.write(imageFilePath, mockMultipartFile.getBytes());
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-        Posts postImage = imageUploadReqDto.toEntity(imageFileName);
+        imageUploadReqDto.setFile(mockMultipartFile);
+        imageUploadReqDto.setContent("테스트 내용");
 
-        when(postsRepository.save(any(Posts.class))).thenReturn(postImage);
-        ImageUploadResDto imageUploadResDto = imageService.imageUpload(imageUploadReqDto);
+        User testUser = User.builder()
+                .id(1L)
+                .username("testuser")
+                .email("testuser@example.com")
+                .password("1234")
+                .build();
+
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+        when(postsRepository.save(any(Posts.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        ImageUploadResDto imageUploadResDto = imageService.imageUpload(imageUploadReqDto, testUser.getId());
 
         assertNotNull(imageUploadResDto);
         assertNotNull(imageUploadResDto.getCreatedAt());
+        verify(userRepository).findByUsername(testUser.getUsername());
         verify(postsRepository).save(any(Posts.class));
     }
 
@@ -100,7 +108,21 @@ class ImageServiceTest {
                 "file", "old-image.jpg","image/jpeg","dummy image content".getBytes()
         );
 
-        Posts tempPost = new Posts(1L, "수정전 내용", oldFile.getName(), ContentType.IMAGE, LocalDateTime.now(),null);
+        User testUser = User.builder()
+                .id(1L)
+                .username("testuser")
+                .email("testuser@example.com")
+                .password("1234")
+                .build();
+
+        Posts tempPost = Posts.builder()
+                .id(1L)
+                .content("수정전 내용")
+                .mediaName(oldFile.getOriginalFilename())
+                .contentType(ContentType.IMAGE)
+                .createdAt(LocalDateTime.now())
+                .user(testUser)
+                .build();
 
         MockMultipartFile newFile = new MockMultipartFile(
                 "file", "new-image.jpg","image/jpeg","dummy image content".getBytes()
@@ -113,7 +135,7 @@ class ImageServiceTest {
         when(postsRepository.findById(eq(1L))).thenReturn(Optional.of(tempPost));
         when(postsRepository.save(any(Posts.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        ImageUpdateResDto imageUpdateResDto = imageService.imageUpdate(postSeq, reqDto);
+        ImageUpdateResDto imageUpdateResDto = imageService.imageUpdate(postSeq, reqDto, testUser.getId());
 
         assertNotNull(imageUpdateResDto);
         assertEquals("수정된 내용", imageUpdateResDto.getContent());
@@ -123,3 +145,4 @@ class ImageServiceTest {
 
     }
 }
+
