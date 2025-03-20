@@ -92,7 +92,7 @@ public class ProfileService {
 
             try {
                 // 이미지 업로드 서비스 호출
-                ImageUploadResDto imageUploadResDto = imageService.imageUpload(imageUploadReqDto);
+                ImageUploadResDto imageUploadResDto = imageService.imageUpload(imageUploadReqDto, user.getId());
 
                 // 이미지 URL 생성 (업로드된 파일 이름을 사용하여 경로 설정)
                 String imageUrl = "/uploads/" + imageUploadResDto.getContent(); // 적합한 경로를 설정
