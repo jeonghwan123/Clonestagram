@@ -2,8 +2,10 @@ package com.goorm.clonestagram.user.repository;
 
 import com.goorm.clonestagram.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -15,4 +17,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
 
+    //Todo 팔로우 엔티티 추가시 활성화
+//    @Query("SELECT f.toUser.id FROM Follow f WHERE f.fromUser.id = :userId")
+    List<Long> findFollowingUserIdsByFromUserId(@Param("userId") Long userId);
 }
