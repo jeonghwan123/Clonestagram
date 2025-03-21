@@ -7,6 +7,11 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+/**
+ * 게시글 정보 응답을 위한 DTO
+ * - id, content, mediaName, contentType, createdAt 반환
+ */
+
 @Getter
 @Builder
 public class PostInfoDto {
@@ -16,6 +21,13 @@ public class PostInfoDto {
     private ContentType contentType;
     private LocalDateTime createdAt;
 
+    /**
+     *
+     * Entity를 Dto로 변환
+     *
+     * @param post 변환할 엔티티
+     * @return 변환된 Dto
+     */
     public static PostInfoDto fromEntity(Posts post) {
         return PostInfoDto.builder()
                 .id(post.getId())

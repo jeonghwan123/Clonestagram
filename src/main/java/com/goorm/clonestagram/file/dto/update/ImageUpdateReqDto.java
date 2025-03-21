@@ -7,8 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 이미지 수정 요청을 위한 DTO
- * - file, content, type을 클라이언트에게 받음
- * - updatedAt 생성
+ * - file, content를 클라이언트에게 받음
  */
 @Getter
 @Setter
