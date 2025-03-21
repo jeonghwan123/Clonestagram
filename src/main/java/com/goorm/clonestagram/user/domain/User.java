@@ -2,12 +2,14 @@ package com.goorm.clonestagram.user.domain;
 
 
 import com.goorm.clonestagram.common.base.BaseTimeEntity;
+import com.goorm.clonestagram.follow.domain.Follows;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 /**
@@ -56,18 +58,18 @@ public class User extends BaseTimeEntity { // BaseTimeEntity를 상속받아 cre
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-     /*
+
 
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts;
 
-    @OneToMany(mappedBy = "follow테이블에서 이름가져오기", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Follow> following;
+    @OneToMany(mappedBy = "toUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Follows> following;
 
-    @OneToMany(mappedBy = "follow테이블에서 가져오기", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Follow> followers;
-     */
+    @OneToMany(mappedBy = "fromUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Follows> followers;
+
 
     @PrePersist
     protected void onCreate() {
