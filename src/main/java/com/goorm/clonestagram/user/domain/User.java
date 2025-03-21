@@ -2,6 +2,7 @@ package com.goorm.clonestagram.user.domain;
 
 
 import com.goorm.clonestagram.common.base.BaseTimeEntity;
+import com.goorm.clonestagram.file.domain.Posts;
 import com.goorm.clonestagram.follow.domain.Follows;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -62,7 +63,7 @@ public class User extends BaseTimeEntity { // BaseTimeEntity를 상속받아 cre
 
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Post> posts;
+    private List<Posts> posts;
 
     @OneToMany(mappedBy = "toUser", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Follows> following;

@@ -1,9 +1,9 @@
 package com.goorm.clonestagram.file.controller;
 
-import com.goorm.clonestagram.file.dto.ImageUpdateReqDto;
-import com.goorm.clonestagram.file.dto.ImageUpdateResDto;
-import com.goorm.clonestagram.file.dto.ImageUploadReqDto;
-import com.goorm.clonestagram.file.dto.ImageUploadResDto;
+import com.goorm.clonestagram.file.dto.update.ImageUpdateReqDto;
+import com.goorm.clonestagram.file.dto.update.ImageUpdateResDto;
+import com.goorm.clonestagram.file.dto.upload.ImageUploadReqDto;
+import com.goorm.clonestagram.file.dto.upload.ImageUploadResDto;
 import com.goorm.clonestagram.file.service.ImageService;
 import com.goorm.clonestagram.util.TempUserDetail;
 import lombok.RequiredArgsConstructor;

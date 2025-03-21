@@ -1,4 +1,4 @@
-package com.goorm.clonestagram.file.dto;
+package com.goorm.clonestagram.file.dto.upload;
 
 import com.goorm.clonestagram.file.ContentType;
 import com.goorm.clonestagram.file.domain.Posts;
@@ -8,8 +8,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
-
 /**
  * 이미지 업로드 요청을 위한 DTO
  * - file, content, type을 클라이언트에게 받음
@@ -17,18 +15,18 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
-public class ImageUploadReqDto {
+public class VideoUploadReqDto {
 
     @Schema(type = "string", format = "binary")//file 업로드를 위해 추가
     private MultipartFile file;
     private String content;
 
-    public Posts toEntity(String imageName, User user) {
+    public Posts toEntity(String imageName , User user) {
         return Posts.builder()
                 .user(user)
                 .content(content)
                 .mediaName(imageName)
-                .contentType(ContentType.IMAGE)
+                .contentType(ContentType.VIDEO)
                 .build();
     }
 }
