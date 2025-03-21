@@ -4,6 +4,7 @@ package com.goorm.clonestagram.user.domain;
 import com.goorm.clonestagram.common.base.BaseTimeEntity;
 import com.goorm.clonestagram.file.domain.Posts;
 import com.goorm.clonestagram.follow.domain.Follows;
+import com.goorm.clonestagram.like.domain.Like;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
@@ -31,7 +32,6 @@ public class User extends BaseTimeEntity { // BaseTimeEntity를 상속받아 cre
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
     @Column(nullable = false, length = 20)
@@ -59,6 +59,9 @@ public class User extends BaseTimeEntity { // BaseTimeEntity를 상속받아 cre
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+
+    @OneToMany(mappedBy = "user")
+    private List<Like> likes;
 
 
 

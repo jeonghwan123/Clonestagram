@@ -1,5 +1,7 @@
 package com.goorm.clonestagram.user.service;
 
+import com.goorm.clonestagram.file.dto.PostInfoDto;
+import com.goorm.clonestagram.file.repository.PostsRepository;
 import com.goorm.clonestagram.file.service.ImageService;
 import com.goorm.clonestagram.follow.repository.FollowRepository;
 import com.goorm.clonestagram.user.domain.User;
@@ -9,8 +11,12 @@ import com.goorm.clonestagram.user.dto.UserProfileDto;
 import com.goorm.clonestagram.user.dto.UserProfileUpdateDto;
 import com.goorm.clonestagram.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 사용자 프로필 관련 비즈니스 로직을 처리하는 서비스 클래스
@@ -24,6 +30,7 @@ public class ProfileService {
     private final FollowRepository followRepository;
     private final UserRepository userRepository;  // 사용자 정보를 관리하는 리포지토리
     private final ImageService imageService;      // 이미지 업로드를 처리하는 서비스
+    private final PostsRepository postsRepository;
     /*
     private final PasswordEncoder passwordEncoder;
     비밀번호는 암호화하는 과정이 로그인 및 회원가입시에 필요하므로 회원가입이나 로그인 기능 추가되면 비밀번호 조회 및 수정 추가예정
@@ -41,8 +48,14 @@ public class ProfileService {
         int followerCount = followRepository.getFollowerCount(userId);
         int followingCount = followRepository.getFollowingCount(userId);
 
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        List<PostInfoDto> postList = postsRepository.findAllByUserId(userId, PageRequest.of(0, 10))
+                .stream()
+                .map(PostInfoDto::fromEntity)
+                .toList();
 
         // 조회된 사용자 정보를 DTO로 변환하여 반환
         return UserProfileDto.builder()
@@ -52,6 +65,7 @@ public class ProfileService {
                 .bio(user.getBio())
                 .followerCount(followerCount)
                 .followingCount(followingCount)
+                .posts(postList)
                 .build();
     }
 

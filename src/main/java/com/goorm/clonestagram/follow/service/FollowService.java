@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,7 +46,13 @@ public class FollowService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        return followRepository.findByFromUser(user).stream()
+        // followRepository에서 결과가 없다면 빈 리스트 반환
+        List<Follows> followsList = followRepository.findByFromUser(user);
+        if (followsList == null || followsList.isEmpty()) {
+            return Collections.emptyList();  // 빈 리스트 반환
+        }
+
+        return followsList.stream()
                 .map(f -> new FollowDto(
                         f.getId(),
                         f.getFromUser().getId(),
@@ -62,7 +69,13 @@ public class FollowService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        return followRepository.findByToUser(user).stream()
+        // followRepository에서 결과가 없다면 빈 리스트 반환
+        List<Follows> followsList = followRepository.findByToUser(user);
+        if (followsList == null || followsList.isEmpty()) {
+            return Collections.emptyList();  // 빈 리스트 반환
+        }
+
+        return followsList.stream()
                 .map(f -> new FollowDto(
                         f.getId(),
                         f.getFromUser().getId(),

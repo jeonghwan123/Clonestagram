@@ -1,11 +1,13 @@
 package com.goorm.clonestagram.user.dto;
 
+import com.goorm.clonestagram.file.dto.PostInfoDto;
 import com.goorm.clonestagram.user.domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 프로필 조회를 위한 DTO
@@ -25,7 +27,9 @@ public class UserProfileDto {
     private LocalDateTime updatedAt;
 
     private int followerCount;
-    private int followingCount ;
+    private int followingCount;
+
+    private List<PostInfoDto> posts;
 
 
     public static UserProfileDto fromEntity(User user) {
