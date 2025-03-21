@@ -2,6 +2,8 @@ package com.goorm.clonestagram.follow.repository;
 
 import com.goorm.clonestagram.follow.domain.Follows;
 import com.goorm.clonestagram.user.domain.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -31,4 +33,10 @@ public interface FollowRepository extends JpaRepository<Follows, Long> {
     // 특정 사용자의 팔로잉 수 가져오기
     @Query("SELECT COUNT(f) FROM Follows f WHERE f.fromUser.id = :userId")
     int getFollowingCount(@Param("userId") Long userId);
+
+    @Query("SELECT f.toUser FROM Follows f WHERE f.fromUser.id = :fromUserId AND f.toUser.username LIKE %:keyword%")
+    Page<User> findFollowingByKeyword(@Param("fromUserId") Long fromUserId, @Param("keyword") String keyword, Pageable pageable);
+
+    @Query("SELECT f.fromUser FROM Follows f WHERE f.toUser.id = :toUserId AND f.fromUser.username LIKE %:keyword%")
+    Page<User> findFollowerByKeyword(@Param("toUserId") Long toUserId, @Param("keyword") String keyword, Pageable pageable);
 }

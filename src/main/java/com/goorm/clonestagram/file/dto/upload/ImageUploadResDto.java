@@ -1,4 +1,4 @@
-package com.goorm.clonestagram.file.dto;
+package com.goorm.clonestagram.file.dto.upload;
 
 import com.goorm.clonestagram.file.ContentType;
 import lombok.Builder;
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Builder
-public class VideoUploadResDto {
+public class ImageUploadResDto {
     private String content;
     private ContentType type;
     private LocalDateTime createdAt;

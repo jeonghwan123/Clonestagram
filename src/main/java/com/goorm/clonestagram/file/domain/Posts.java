@@ -64,28 +64,28 @@ public class Posts extends BaseTimeEntity {
      * 게시물 생성 시간
      * - imageUploadReqDto.toEntity()에서 셋팅
      */
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+//    @Column(name = "created_at", nullable = false)
+//    private LocalDateTime createdAt;
 
     /**
      * 게시물 수정 시간
      * - 게시물이 업데이트 될 때 변경됨
      * - 처음 생성 시 null 가능
      */
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+//    @Column(name = "updated_at")
+//    private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "post")
     private List<Like> likes;
 
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
+//    @PrePersist
+//    protected void onCreate() {
+//        this.createdAt = LocalDateTime.now();
+//    }
 
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
+//    @PreUpdate
+//    protected void onUpdate() {
+//        this.updatedAt = LocalDateTime.now();
+//    }
 
 }

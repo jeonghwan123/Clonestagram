@@ -1,10 +1,10 @@
 package com.goorm.clonestagram.file.controller;
 
 
-import com.goorm.clonestagram.file.dto.VideoUpdateReqDto;
-import com.goorm.clonestagram.file.dto.VideoUpdateResDto;
-import com.goorm.clonestagram.file.dto.VideoUploadReqDto;
-import com.goorm.clonestagram.file.dto.VideoUploadResDto;
+import com.goorm.clonestagram.file.dto.update.VideoUpdateReqDto;
+import com.goorm.clonestagram.file.dto.update.VideoUpdateResDto;
+import com.goorm.clonestagram.file.dto.upload.VideoUploadReqDto;
+import com.goorm.clonestagram.file.dto.upload.VideoUploadResDto;
 import com.goorm.clonestagram.file.service.VideoService;
 import com.goorm.clonestagram.util.TempUserDetail;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 양상 업로드 요청을 처리하는 컨트롤러
+ * 영상 업로드 요청을 처리하는 컨트롤러
  * - 클라이언트로부터 영상 업로드 요청을 받아 검증 및 서비스 호출을 수행
  */
 @RestController
