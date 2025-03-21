@@ -2,11 +2,14 @@ package com.goorm.clonestagram.file.domain;
 
 import com.goorm.clonestagram.common.base.BaseTimeEntity;
 import com.goorm.clonestagram.file.ContentType;
+import com.goorm.clonestagram.like.domain.Like;
 import com.goorm.clonestagram.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
 /**
  * Posts 엔티티
  * - 이미지, 컨텐츠 정보를 담는 테이블 매핑 클래스
@@ -71,6 +74,9 @@ public class Posts extends BaseTimeEntity {
      */
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "post")
+    private List<Like> likes;
 
     @PrePersist
     protected void onCreate() {
