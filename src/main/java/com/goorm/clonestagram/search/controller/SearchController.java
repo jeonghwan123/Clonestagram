@@ -12,6 +12,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/search")
 public class SearchController {
 
     private final SearchService searchService;
@@ -33,7 +35,7 @@ public class SearchController {
      * @param pageable 페이징 기능
      * @return 유저 리스트, 검색된 데이터 수
      */
-    @GetMapping("/search/users")
+    @GetMapping("/users")
     public ResponseEntity<SearchUserResDto> searchUsers(@RequestParam @NotBlank String keyword,
                                                         @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)Pageable pageable){
         return ResponseEntity.ok(searchService.searchUserByKeyword(keyword, pageable));
@@ -49,7 +51,7 @@ public class SearchController {
      * @param pageable 페이징 기능
      * @return 유저 리스트, 검색된 데이터 수
      */
-    @GetMapping("/search/following")
+    @GetMapping("/following")
     public ResponseEntity<SearchUserResDto> searchFollowing(@AuthenticationPrincipal TempUserDetail userDetail,
                                                             @RequestParam @NotBlank String keyword,
                                                             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)Pageable pageable){
@@ -69,7 +71,7 @@ public class SearchController {
      * @param pageable 페이징 기능
      * @return 유저 리스트, 검색된 데이터 수
      */
-    @GetMapping("/search/follower")
+    @GetMapping("/follower")
     public ResponseEntity<SearchUserResDto> searchFollower(@AuthenticationPrincipal TempUserDetail userDetail,
                                                            @RequestParam @NotBlank String keyword,
                                                            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)Pageable pageable){
