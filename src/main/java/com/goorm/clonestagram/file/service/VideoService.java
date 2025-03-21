@@ -1,7 +1,10 @@
 package com.goorm.clonestagram.file.service;
 
 import com.goorm.clonestagram.file.domain.Posts;
-import com.goorm.clonestagram.file.dto.*;
+import com.goorm.clonestagram.file.dto.update.VideoUpdateReqDto;
+import com.goorm.clonestagram.file.dto.update.VideoUpdateResDto;
+import com.goorm.clonestagram.file.dto.upload.VideoUploadReqDto;
+import com.goorm.clonestagram.file.dto.upload.VideoUploadResDto;
 import com.goorm.clonestagram.file.repository.PostsRepository;
 import com.goorm.clonestagram.user.domain.User;
 import com.goorm.clonestagram.user.repository.UserRepository;

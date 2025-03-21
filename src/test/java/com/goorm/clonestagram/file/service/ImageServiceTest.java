@@ -2,10 +2,10 @@ package com.goorm.clonestagram.file.service;
 
 import com.goorm.clonestagram.file.ContentType;
 import com.goorm.clonestagram.file.domain.Posts;
-import com.goorm.clonestagram.file.dto.ImageUpdateReqDto;
-import com.goorm.clonestagram.file.dto.ImageUpdateResDto;
-import com.goorm.clonestagram.file.dto.ImageUploadReqDto;
-import com.goorm.clonestagram.file.dto.ImageUploadResDto;
+import com.goorm.clonestagram.file.dto.update.ImageUpdateReqDto;
+import com.goorm.clonestagram.file.dto.update.ImageUpdateResDto;
+import com.goorm.clonestagram.file.dto.upload.ImageUploadReqDto;
+import com.goorm.clonestagram.file.dto.upload.ImageUploadResDto;
 import com.goorm.clonestagram.file.repository.PostsRepository;
 import com.goorm.clonestagram.user.domain.User;
 import com.goorm.clonestagram.user.repository.UserRepository;
@@ -14,8 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -23,7 +21,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 

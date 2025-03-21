@@ -1,4 +1,4 @@
-package com.goorm.clonestagram.file.dto;
+package com.goorm.clonestagram.file.dto.update;
 
 import com.goorm.clonestagram.file.ContentType;
 import lombok.Builder;

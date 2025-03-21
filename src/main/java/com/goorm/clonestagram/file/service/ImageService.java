@@ -1,10 +1,10 @@
 package com.goorm.clonestagram.file.service;
 
 import com.goorm.clonestagram.file.domain.Posts;
-import com.goorm.clonestagram.file.dto.ImageUpdateReqDto;
-import com.goorm.clonestagram.file.dto.ImageUpdateResDto;
-import com.goorm.clonestagram.file.dto.ImageUploadReqDto;
-import com.goorm.clonestagram.file.dto.ImageUploadResDto;
+import com.goorm.clonestagram.file.dto.update.ImageUpdateReqDto;
+import com.goorm.clonestagram.file.dto.update.ImageUpdateResDto;
+import com.goorm.clonestagram.file.dto.upload.ImageUploadReqDto;
+import com.goorm.clonestagram.file.dto.upload.ImageUploadResDto;
 import com.goorm.clonestagram.file.repository.PostsRepository;
 import com.goorm.clonestagram.user.domain.User;
 import com.goorm.clonestagram.user.repository.UserRepository;

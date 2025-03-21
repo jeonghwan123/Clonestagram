@@ -1,10 +1,10 @@
 package com.goorm.clonestagram.file.controller;
 
 
-import com.goorm.clonestagram.file.dto.VideoUpdateReqDto;
-import com.goorm.clonestagram.file.dto.VideoUpdateResDto;
-import com.goorm.clonestagram.file.dto.VideoUploadReqDto;
-import com.goorm.clonestagram.file.dto.VideoUploadResDto;
+import com.goorm.clonestagram.file.dto.update.VideoUpdateReqDto;
+import com.goorm.clonestagram.file.dto.update.VideoUpdateResDto;
+import com.goorm.clonestagram.file.dto.upload.VideoUploadReqDto;
+import com.goorm.clonestagram.file.dto.upload.VideoUploadResDto;
 import com.goorm.clonestagram.file.service.VideoService;
 import com.goorm.clonestagram.util.TempUserDetail;
 import lombok.RequiredArgsConstructor;
