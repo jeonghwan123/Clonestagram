@@ -16,12 +16,17 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 public class UserProfileDto {
+    private Long id;
     private String username;
     private String email;
     private String bio;
     private String profileimg;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    private int followerCount;
+    private int followingCount ;
+
 
     public static UserProfileDto fromEntity(User user) {
         return UserProfileDto.builder()

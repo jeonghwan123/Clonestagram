@@ -1,4 +1,4 @@
-package com.goorm.clonestagram.service;
+package com.goorm.clonestagram.comment.service;
 
 import com.goorm.clonestagram.comment.domain.CommentEntity;
 import com.goorm.clonestagram.comment.service.CommentService;
