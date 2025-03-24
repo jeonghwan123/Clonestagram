@@ -89,6 +89,7 @@ public class VideoService {
                 .content(post.getContent())
                 .type(post.getContentType())
                 .createdAt(post.getCreatedAt())
+                .hashTagList(videoUploadReqDto.getHashTagList())
                 .build();
     }
 
@@ -181,6 +182,7 @@ public class VideoService {
                 .content(updatedPost.getContent())
                 .type(updatedPost.getContentType())
                 .updatedAt(updatedPost.getUpdatedAt())
+                .hashTagList(videoUpdateReqDto.getHashTagList())
                 .build();
     }
 

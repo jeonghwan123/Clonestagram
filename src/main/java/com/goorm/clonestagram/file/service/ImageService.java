@@ -89,6 +89,7 @@ public class ImageService {
                 .content(post.getContent())
                 .type(post.getContentType())
                 .createdAt(post.getCreatedAt())
+                .hashTagList(imageUploadReqDto.getHashTagList())
                 .build();
     }
 
@@ -183,6 +184,7 @@ public class ImageService {
                 .content(updatedPost.getContent())
                 .type(updatedPost.getContentType())
                 .updatedAt(updatedPost.getUpdatedAt())
+                .hashTagList(imageUpdateReqDto.getHashTagList())
                 .build();
     }
 
