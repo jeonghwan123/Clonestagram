@@ -1,11 +1,10 @@
 package com.goorm.clonestagram.comment.service;
 
 import com.goorm.clonestagram.comment.domain.CommentEntity;
-import com.goorm.clonestagram.comment.service.CommentService;
 import com.goorm.clonestagram.comment.repository.CommentRepository;
-import com.goorm.clonestagram.file.ContentType;
-import com.goorm.clonestagram.file.domain.Posts;
-import com.goorm.clonestagram.file.repository.PostsRepository;
+import com.goorm.clonestagram.post.ContentType;
+import com.goorm.clonestagram.post.domain.Posts;
+import com.goorm.clonestagram.post.repository.PostsRepository;
 import com.goorm.clonestagram.user.domain.User;
 import com.goorm.clonestagram.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;

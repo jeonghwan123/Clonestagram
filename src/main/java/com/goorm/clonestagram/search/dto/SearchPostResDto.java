@@ -1,6 +1,6 @@
 package com.goorm.clonestagram.search.dto;
 
-import com.goorm.clonestagram.file.dto.PostInfoDto;
+import com.goorm.clonestagram.post.dto.PostInfoDto;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.domain.Page;

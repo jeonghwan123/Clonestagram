@@ -1,6 +1,6 @@
 package com.goorm.clonestagram.user.dto;
 
-import com.goorm.clonestagram.file.dto.PostInfoDto;
+import com.goorm.clonestagram.post.dto.PostInfoDto;
 import com.goorm.clonestagram.user.domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

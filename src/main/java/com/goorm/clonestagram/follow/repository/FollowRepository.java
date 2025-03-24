@@ -25,6 +25,9 @@ public interface FollowRepository extends JpaRepository<Follows, Long> {
     // 특정 사용자의 팔로워 목록 조회 (나를 팔로우한 사람들)
     List<Follows> findByToUser(User toUser);
 
+    @Query("SELECT f.fromUser.id FROM Follows f WHERE f.toUser.id = :userId")
+    List<Long> findFollowerIdsByToUserId(@Param("userId") Long userId);
+
 
     // 특정 사용자의 팔로워 수 가져오기
     @Query("SELECT COUNT(f) FROM Follows f WHERE f.toUser.id = :userId")
@@ -39,4 +42,6 @@ public interface FollowRepository extends JpaRepository<Follows, Long> {
 
     @Query("SELECT f.fromUser FROM Follows f WHERE f.toUser.id = :toUserId AND f.fromUser.username LIKE %:keyword%")
     Page<User> findFollowerByKeyword(@Param("toUserId") Long toUserId, @Param("keyword") String keyword, Pageable pageable);
+
+
 }

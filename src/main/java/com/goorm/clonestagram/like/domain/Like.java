@@ -4,7 +4,7 @@ import com.goorm.clonestagram.common.base.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import com.goorm.clonestagram.user.domain.User;
-import com.goorm.clonestagram.file.domain.Posts;
+import com.goorm.clonestagram.post.domain.Posts;
 
 import java.time.LocalDateTime;
 
