@@ -92,7 +92,7 @@ public class SearchController {
      */
     @GetMapping("/search/tag")
     public ResponseEntity<SearchPostResDto> searchHashTag(@RequestParam @NotBlank String keyword,
-                                                          @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)Pageable pageable) {
+                                                          @PageableDefault(size = 20, sort = "posts.createdAt", direction = Sort.Direction.DESC)Pageable pageable) {
         return ResponseEntity.ok(searchService.searchHashTagByKeyword(keyword,pageable));
     }
 }
