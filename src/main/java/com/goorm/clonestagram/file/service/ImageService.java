@@ -6,6 +6,10 @@ import com.goorm.clonestagram.file.dto.update.ImageUpdateResDto;
 import com.goorm.clonestagram.file.dto.upload.ImageUploadReqDto;
 import com.goorm.clonestagram.file.dto.upload.ImageUploadResDto;
 import com.goorm.clonestagram.file.repository.PostsRepository;
+import com.goorm.clonestagram.hashtag.entity.HashTags;
+import com.goorm.clonestagram.hashtag.entity.PostHashTags;
+import com.goorm.clonestagram.hashtag.repository.PostHashTagRepository;
+import com.goorm.clonestagram.hashtag.repository.HashTagRepository;
 import com.goorm.clonestagram.user.domain.User;
 import com.goorm.clonestagram.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +34,8 @@ public class ImageService {
 
     private final PostsRepository postsRepository;
     private final UserRepository userRepository;
+    private final HashTagRepository hashTagRepository;
+    private final PostHashTagRepository postHashTagRepository;
 
     @Value("${image.path}")
     private String uploadFolder;
@@ -68,7 +74,17 @@ public class ImageService {
         Posts postEntity = imageUploadReqDto.toEntity(imageFileName, user);
         Posts post = postsRepository.save(postEntity);
 
-        //5. 모든 작업이 완료된 경우 응답 반환
+        //5. Dto에 있는 HashTagList를 저장
+        for (String tagContent : imageUploadReqDto.getHashTagList()) {
+            //5-1. tagList에서 tag 내용 하나를 추출한 후 조회
+            HashTags tag = hashTagRepository.findByTagContent(tagContent)
+                    //5-2. tag가 저장되어 있지 않으면 새롭게 저장
+                    .orElseGet(() -> hashTagRepository.save(new HashTags(null, tagContent)));
+            //5-3. 추출된 태그의 id와 피드의 id를 관계테이블에 저장
+            postHashTagRepository.save(new PostHashTags(null,tag,post));
+        }
+
+        //6. 모든 작업이 완료된 경우 응답 반환
         return ImageUploadResDto.builder()
                 .content(post.getContent())
                 .type(post.getContentType())
@@ -111,6 +127,7 @@ public class ImageService {
             }catch (IOException e){
                 throw new RuntimeException("파일 저장 중 오류 발생 : " + e.getMessage());
             }
+
             //2-4. 수정된 파일명 반영
             String oldFileName = posts.getMediaName();
             posts.setMediaName(imageFileName);
@@ -134,6 +151,22 @@ public class ImageService {
 
             //3-2. 업데이트 되었음을 표시
             updated = true;
+        }
+
+        //4. 해시태그 수정 여부 파악
+        if(imageUpdateReqDto.getHashTagList() != null && !imageUpdateReqDto.getHashTagList().isEmpty()){
+            //4-1. 기존의 해시태그 리스트 삭제
+            postHashTagRepository.deleteAllByPostsId(posts.getId());
+
+            //4-2. 새롭게 해시 태그 리스트 저장
+            for (String tagContent : imageUpdateReqDto.getHashTagList()) {
+                //4-2. tagList에서 tag 내용 하나를 추출한 후 조회
+                HashTags tag = hashTagRepository.findByTagContent(tagContent)
+                        //4-2. tag가 저장되어 있지 않으면 새롭게 저장
+                        .orElseGet(() -> hashTagRepository.save(new HashTags(null, tagContent)));
+                //4-3. 추출된 태그의 id와 피드의 id를 관계테이블에 저장
+                postHashTagRepository.save(new PostHashTags(null,tag,posts));
+            }
         }
 
         Posts updatedPost;
@@ -176,5 +209,7 @@ public class ImageService {
 
         //3. DB에서 데이터 삭제
         postsRepository.delete(posts);
+        postHashTagRepository.deleteAllByPostsId(posts.getId());
+
     }
 }
