@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -75,7 +77,8 @@ public class ImageService {
         Posts post = postsRepository.save(postEntity);
 
         //5. Dto에 있는 HashTagList를 저장
-        for (String tagContent : imageUploadReqDto.getHashTagList()) {
+        for (String tagContent : Optional.ofNullable(imageUploadReqDto.getHashTagList())
+                                        .orElse(Collections.emptyList())) {
             //5-1. tagList에서 tag 내용 하나를 추출한 후 조회
             HashTags tag = hashTagRepository.findByTagContent(tagContent)
                     //5-2. tag가 저장되어 있지 않으면 새롭게 저장
@@ -90,6 +93,7 @@ public class ImageService {
                 .type(post.getContentType())
                 .createdAt(post.getCreatedAt())
                 .hashTagList(imageUploadReqDto.getHashTagList())
+                .mediaName(post.getMediaName())
                 .build();
     }
 
@@ -160,7 +164,8 @@ public class ImageService {
             postHashTagRepository.deleteAllByPostsId(posts.getId());
 
             //4-2. 새롭게 해시 태그 리스트 저장
-            for (String tagContent : imageUpdateReqDto.getHashTagList()) {
+            for (String tagContent : Optional.ofNullable(imageUpdateReqDto.getHashTagList())
+                                          .orElse(Collections.emptyList())) {
                 //4-2. tagList에서 tag 내용 하나를 추출한 후 조회
                 HashTags tag = hashTagRepository.findByTagContent(tagContent)
                         //4-2. tag가 저장되어 있지 않으면 새롭게 저장
