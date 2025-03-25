@@ -72,16 +72,9 @@ public class User{ // BaseTimeEntity를 상속받아 create, update 관리
     @OneToMany(mappedBy = "fromUser", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Follows> followers;
 
+    @Version  // 낙관적 락 적용
+    private Integer version ;
 
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 
 
 }
