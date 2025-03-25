@@ -5,12 +5,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 
 @EnableJpaAuditing
 @EntityScan(basePackages = "com.goorm.clonestagram") // ✅ Entity 패키지 스캔 설정
 @EnableJpaRepositories(basePackages = "com.goorm.clonestagram") // ✅ Repository 패키지 스캔 설정
 @SpringBootApplication
+@EnableScheduling
 public class ClonestagramApplication {
 
     public static void main(String[] args) {

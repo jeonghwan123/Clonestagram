@@ -5,7 +5,7 @@ package com.goorm.clonestagram.post;
  * - IMAGE, VIDEO
  */
 public enum EntityType {
-        POST("posts"),
+        POST("post"),
         USER("user");
         private final String value;
 
