@@ -37,7 +37,7 @@ out/
 .vscode/
 
 ### image/video ###
-/uploads/image/*
+/uploads/*
 
 ### db 설정 파일 ###
 /src/main/resources/application-db.properties

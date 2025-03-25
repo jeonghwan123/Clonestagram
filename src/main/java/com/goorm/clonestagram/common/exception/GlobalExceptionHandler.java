@@ -1,8 +1,12 @@
 package com.goorm.clonestagram.common.exception;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Global Exception Handler
@@ -39,6 +43,14 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponseDto> handleServerError(RuntimeException e){
+        ErrorResponseDto errorResponseDto = ErrorResponseDto.builder()
+                .errorMessage(e.getMessage())
+                .build();
+        return ResponseEntity.badRequest().body(errorResponseDto);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponseDto> handleValidationExceptions(MethodArgumentNotValidException e) {
         ErrorResponseDto errorResponseDto = ErrorResponseDto.builder()
                 .errorMessage(e.getMessage())
                 .build();

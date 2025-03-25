@@ -1,6 +1,7 @@
 package com.goorm.clonestagram.search.controller;
 
 
+import com.goorm.clonestagram.search.dto.SearchPostResDto;
 import com.goorm.clonestagram.search.dto.SearchUserResDto;
 import com.goorm.clonestagram.search.service.SearchService;
 import com.goorm.clonestagram.util.TempUserDetail;
@@ -89,9 +90,9 @@ public class SearchController {
      * @param pageable 페이징 기능
      * @return 피드 리스트, 검색된 데이터 수
      */
-//    @GetMapping("/search/tag")
-//    public ResponseEntity<SearchResDto> searchHashTag(@RequestParam @NotBlank String keyword,
-//                                                      @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)Pageable pageable) {
-//        return ResponseEntity.ok(searchService.searchHashTagByKeyword(keyword,pageable));
-//    }
+    @GetMapping("/search/tag")
+    public ResponseEntity<SearchPostResDto> searchHashTag(@RequestParam @NotBlank String keyword,
+                                                          @PageableDefault(size = 20, sort = "posts.createdAt", direction = Sort.Direction.DESC)Pageable pageable) {
+        return ResponseEntity.ok(searchService.searchHashTagByKeyword(keyword,pageable));
+    }
 }

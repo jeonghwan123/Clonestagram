@@ -11,6 +11,7 @@ import com.goorm.clonestagram.user.dto.UserProfileDto;
 import com.goorm.clonestagram.user.dto.UserProfileUpdateDto;
 import com.goorm.clonestagram.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,10 @@ public class ProfileService {
     private final UserRepository userRepository;  // 사용자 정보를 관리하는 리포지토리
     private final ImageService imageService;      // 이미지 업로드를 처리하는 서비스
     private final PostsRepository postsRepository;
+
+    @Value("${image.path}")
+    private String uploadFolder;
+
     /*
     private final PasswordEncoder passwordEncoder;
     비밀번호는 암호화하는 과정이 로그인 및 회원가입시에 필요하므로 회원가입이나 로그인 기능 추가되면 비밀번호 조회 및 수정 추가예정
@@ -116,7 +121,7 @@ public User updateUserProfile(Long userId, UserProfileUpdateDto userProfileUpdat
             ImageUploadResDto imageUploadResDto = imageService.imageUpload(imageUploadReqDto, user.getId());
 
             // 이미지 URL 생성 (업로드된 파일 이름을 사용하여 경로 설정)
-            String imageUrl = "/uploads/" + imageUploadResDto.getContent(); // 적합한 경로를 설정
+            String imageUrl = uploadFolder + imageUploadResDto.getMediaName(); // 적합한 경로를 설정
 
             // 프로필 이미지 URL로 업데이트
             user.setProfileimg(imageUrl);
