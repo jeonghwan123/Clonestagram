@@ -1,11 +1,14 @@
 package com.goorm.clonestagram.file.service;
 
+import com.goorm.clonestagram.file.EntityType;
 import com.goorm.clonestagram.file.domain.Posts;
+import com.goorm.clonestagram.file.domain.SoftDelete;
 import com.goorm.clonestagram.file.dto.update.VideoUpdateReqDto;
 import com.goorm.clonestagram.file.dto.update.VideoUpdateResDto;
 import com.goorm.clonestagram.file.dto.upload.VideoUploadReqDto;
 import com.goorm.clonestagram.file.dto.upload.VideoUploadResDto;
 import com.goorm.clonestagram.file.repository.PostsRepository;
+import com.goorm.clonestagram.file.repository.SoftDeleteRepository;
 import com.goorm.clonestagram.hashtag.entity.HashTags;
 import com.goorm.clonestagram.hashtag.entity.PostHashTags;
 import com.goorm.clonestagram.hashtag.repository.PostHashTagRepository;
@@ -21,6 +24,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
@@ -38,6 +42,7 @@ public class VideoService {
     private final UserRepository userRepository;
     private final HashTagRepository hashTagRepository;
     private final PostHashTagRepository postHashTagRepository;
+    private final SoftDeleteRepository softDeleteRepository;
 
     @Value("${video.path}")
     private String uploadFolder;
@@ -212,7 +217,9 @@ public class VideoService {
         }
 
         //3. DB에서 데이터 삭제
-        postsRepository.delete(posts);
+        posts.setDeleted(true);
+        posts.setDeletedAt(LocalDateTime.now());
+        softDeleteRepository.save(new SoftDelete(null, EntityType.POST, posts.getId(), posts.getDeletedAt()));
         postHashTagRepository.deleteAllByPostsId(posts.getId());
     }
 }
