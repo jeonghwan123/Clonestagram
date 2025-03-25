@@ -51,7 +51,6 @@ public class CommentService {
                 .user(user)
                 .posts(posts)
                 .content(commentRequest.getContent())
-                .createdAt(commentRequest.getCreatedAt())
                 .build());
     }
 
