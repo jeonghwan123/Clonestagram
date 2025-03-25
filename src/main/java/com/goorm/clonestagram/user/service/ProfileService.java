@@ -1,12 +1,12 @@
 package com.goorm.clonestagram.user.service;
 
-import com.goorm.clonestagram.file.dto.PostInfoDto;
-import com.goorm.clonestagram.file.repository.PostsRepository;
-import com.goorm.clonestagram.file.service.ImageService;
+import com.goorm.clonestagram.post.dto.PostInfoDto;
+import com.goorm.clonestagram.post.repository.PostsRepository;
+import com.goorm.clonestagram.post.service.ImageService;
 import com.goorm.clonestagram.follow.repository.FollowRepository;
 import com.goorm.clonestagram.user.domain.User;
-import com.goorm.clonestagram.file.dto.upload.ImageUploadReqDto;
-import com.goorm.clonestagram.file.dto.upload.ImageUploadResDto;
+import com.goorm.clonestagram.post.dto.upload.ImageUploadReqDto;
+import com.goorm.clonestagram.post.dto.upload.ImageUploadResDto;
 import com.goorm.clonestagram.user.dto.UserProfileDto;
 import com.goorm.clonestagram.user.dto.UserProfileUpdateDto;
 import com.goorm.clonestagram.user.repository.UserRepository;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 사용자 프로필 관련 비즈니스 로직을 처리하는 서비스 클래스

@@ -1,6 +1,6 @@
 package com.goorm.clonestagram.hashtag.entity;
 
-import com.goorm.clonestagram.file.domain.Posts;
+import com.goorm.clonestagram.post.domain.Posts;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
