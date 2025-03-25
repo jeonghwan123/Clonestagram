@@ -27,7 +27,7 @@ public class Follows {
     @JoinColumn(name = "following_id")
     private User toUser;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "follow_created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @PrePersist

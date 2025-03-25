@@ -1,7 +1,7 @@
 package com.goorm.clonestagram.like.service;
 
-import com.goorm.clonestagram.file.domain.Posts;
-import com.goorm.clonestagram.file.repository.PostsRepository;
+import com.goorm.clonestagram.post.domain.Posts;
+import com.goorm.clonestagram.post.repository.PostsRepository;
 import com.goorm.clonestagram.like.domain.Like;
 import com.goorm.clonestagram.like.repository.LikeRepository;
 import com.goorm.clonestagram.user.domain.User;
@@ -13,8 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static com.goorm.clonestagram.file.ContentType.IMAGE;
-import static com.goorm.clonestagram.file.ContentType.VIDEO;
+import static com.goorm.clonestagram.post.ContentType.IMAGE;
+import static com.goorm.clonestagram.post.ContentType.VIDEO;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
