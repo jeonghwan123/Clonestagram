@@ -28,7 +28,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User extends BaseTimeEntity { // BaseTimeEntity를 상속받아 create, update 관리
+public class User{ // BaseTimeEntity를 상속받아 create, update 관리
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -62,9 +62,7 @@ public class User extends BaseTimeEntity { // BaseTimeEntity를 상속받아 cre
 
     @OneToMany(mappedBy = "user")
     private List<Like> likes;
-
-
-
+//
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Posts> posts;
 
@@ -78,7 +76,6 @@ public class User extends BaseTimeEntity { // BaseTimeEntity를 상속받아 cre
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate

@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 /**
  * 이미지 업로드 요청을 위한 DTO
  * - file, content, type을 클라이언트에게 받음
@@ -20,6 +22,7 @@ public class ImageUploadReqDto {
     @Schema(type = "string", format = "binary")//file 업로드를 위해 추가
     private MultipartFile file;
     private String content;
+    private List<String> hashTagList;
 
     public Posts toEntity(String imageName, User user) {
         return Posts.builder()

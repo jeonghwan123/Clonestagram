@@ -7,6 +7,10 @@ import com.goorm.clonestagram.post.dto.upload.ImageUploadReqDto;
 import com.goorm.clonestagram.post.dto.upload.ImageUploadResDto;
 import com.goorm.clonestagram.post.repository.PostsRepository;
 import com.goorm.clonestagram.follow.repository.FollowRepository;
+import com.goorm.clonestagram.hashtag.entity.HashTags;
+import com.goorm.clonestagram.hashtag.entity.PostHashTags;
+import com.goorm.clonestagram.hashtag.repository.PostHashTagRepository;
+import com.goorm.clonestagram.hashtag.repository.HashTagRepository;
 import com.goorm.clonestagram.user.domain.User;
 import com.goorm.clonestagram.feed.service.FeedService;
 import com.goorm.clonestagram.user.repository.UserRepository;
@@ -19,6 +23,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -32,6 +38,8 @@ public class ImageService {
 
     private final PostsRepository postsRepository;
     private final UserRepository userRepository;
+    private final HashTagRepository hashTagRepository;
+    private final PostHashTagRepository postHashTagRepository;
     private final FeedService feedService;
     private final FollowRepository followRepository; // 사용자의 팔로워를 조회하기 위함
 
@@ -75,11 +83,24 @@ public class ImageService {
         // 피드 생성 로직 추가
         feedService.createFeedForFollowers(post); // post.getUser().getId() 기반으로 팔로워 조회
 
-        //5. 모든 작업이 완료된 경우 응답 반환
+        //5. Dto에 있는 HashTagList를 저장
+        for (String tagContent : Optional.ofNullable(imageUploadReqDto.getHashTagList())
+                                        .orElse(Collections.emptyList())) {
+            //5-1. tagList에서 tag 내용 하나를 추출한 후 조회
+            HashTags tag = hashTagRepository.findByTagContent(tagContent)
+                    //5-2. tag가 저장되어 있지 않으면 새롭게 저장
+                    .orElseGet(() -> hashTagRepository.save(new HashTags(null, tagContent)));
+            //5-3. 추출된 태그의 id와 피드의 id를 관계테이블에 저장
+            postHashTagRepository.save(new PostHashTags(null,tag,post));
+        }
+
+        //6. 모든 작업이 완료된 경우 응답 반환
         return ImageUploadResDto.builder()
                 .content(post.getContent())
                 .type(post.getContentType())
                 .createdAt(post.getCreatedAt())
+                .hashTagList(imageUploadReqDto.getHashTagList())
+                .mediaName(post.getMediaName())
                 .build();
     }
 
@@ -118,6 +139,7 @@ public class ImageService {
             }catch (IOException e){
                 throw new RuntimeException("파일 저장 중 오류 발생 : " + e.getMessage());
             }
+
             //2-4. 수정된 파일명 반영
             String oldFileName = posts.getMediaName();
             posts.setMediaName(imageFileName);
@@ -143,6 +165,23 @@ public class ImageService {
             updated = true;
         }
 
+        //4. 해시태그 수정 여부 파악
+        if(imageUpdateReqDto.getHashTagList() != null && !imageUpdateReqDto.getHashTagList().isEmpty()){
+            //4-1. 기존의 해시태그 리스트 삭제
+            postHashTagRepository.deleteAllByPostsId(posts.getId());
+
+            //4-2. 새롭게 해시 태그 리스트 저장
+            for (String tagContent : Optional.ofNullable(imageUpdateReqDto.getHashTagList())
+                                          .orElse(Collections.emptyList())) {
+                //4-2. tagList에서 tag 내용 하나를 추출한 후 조회
+                HashTags tag = hashTagRepository.findByTagContent(tagContent)
+                        //4-2. tag가 저장되어 있지 않으면 새롭게 저장
+                        .orElseGet(() -> hashTagRepository.save(new HashTags(null, tagContent)));
+                //4-3. 추출된 태그의 id와 피드의 id를 관계테이블에 저장
+                postHashTagRepository.save(new PostHashTags(null,tag,posts));
+            }
+        }
+
         Posts updatedPost;
         if(updated){
             //5. 업데이트된 게시글을 DB에 저장
@@ -157,6 +196,7 @@ public class ImageService {
                 .content(updatedPost.getContent())
                 .type(updatedPost.getContentType())
                 .updatedAt(updatedPost.getUpdatedAt())
+                .hashTagList(imageUpdateReqDto.getHashTagList())
                 .build();
     }
 
@@ -183,6 +223,8 @@ public class ImageService {
 
         //3. DB에서 데이터 삭제
         postsRepository.delete(posts);
+        postHashTagRepository.deleteAllByPostsId(posts.getId());
+
         // 피드 삭제 로직 추가
         feedService.deleteFeedByPostId(postSeq);
     }

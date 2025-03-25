@@ -1,6 +1,10 @@
 package com.goorm.clonestagram.search.service;
 
+import com.goorm.clonestagram.post.domain.Posts;
+import com.goorm.clonestagram.post.dto.PostInfoDto;
 import com.goorm.clonestagram.follow.repository.FollowRepository;
+import com.goorm.clonestagram.hashtag.repository.PostHashTagRepository;
+import com.goorm.clonestagram.search.dto.SearchPostResDto;
 import com.goorm.clonestagram.search.dto.SearchUserResDto;
 import com.goorm.clonestagram.user.domain.User;
 import com.goorm.clonestagram.user.dto.UserProfileDto;
@@ -19,6 +23,7 @@ public class SearchService {
 
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
+    private final PostHashTagRepository postHashTagRepository;
     /**
      * 유저 검색
      * - 검색어를 활용해 검색어와 부분 혹은 전체 일치하는 유저 반환
@@ -116,30 +121,24 @@ public class SearchService {
      * @param pageable 페이징 기능
      * @return 피드 리스트, 검색된 데이터 수
      */
-//    public SearchResDto searchHashTagByKeyword(@NotBlank String keyword, Pageable pageable) {
+    public SearchPostResDto searchHashTagByKeyword(@NotBlank String keyword, Pageable pageable) {
         //1. 게시글의 해시테그중에 keyword와 관련된 태그를 가지고 있는 데이터 모두 반환, Like 사용
-        //public interface PostHashtagRepository extends JpaRepository<PostHashtag, Long> {
-        //
-        //    @Query("SELECT ph.post FROM PostHashtag ph WHERE ph.hashtag.name LIKE %:keyword%")
-        //    Page<Post> findPostsByHashtagKeyword(@Param("keyword") String keyword, Pageable pageable);
-        //}
+        Page<Posts> tagPosts = postHashTagRepository.findPostsByHashtagKeyword(keyword, pageable);
 
-//        Page<Posts> tagPosts = postHashtagRepository.findPostsByHashtagKeyword(keyword, pageable);
+//        2. 반환을 위해 users를 UserProfileDto형태로 변환
+        Page<PostInfoDto> userProfileDtos = tagPosts.map(posts -> PostInfoDto.builder()
+                .id(posts.getId())
+                .content(posts.getContent())
+                .mediaName(posts.getMediaName())
+                .contentType(posts.getContentType())
+                .createdAt(posts.getCreatedAt())
+                .build()
+        );
 
-        //2. 반환을 위해 users를 UserProfileDto형태로 변환
-//        Page<PostInfoDto> userProfileDtos = tagPosts.map(posts -> PostInfoDto.builder()
-//                .id(posts.getId())
-//                .content(posts.getContent())
-//                .mediaName(posts.getMediaName())
-//                .contentType(posts.getContentType())
-//                .createdAt(posts.getCreatedAt())
-//                .build()
-//        );
-
-        //3. UserProfileDto의 리스트와 users가 담고있는 전체 데이터 수를 SearchResDto에 넣고 반환
-//        return SearchPostResDto.builder()
-//                .postList(userProfileDtos)
-//                .totalCount(tagPosts.getTotalElements())
-//                .build();
-//    }
+//        3. UserProfileDto의 리스트와 users가 담고있는 전체 데이터 수를 SearchResDto에 넣고 반환
+        return SearchPostResDto.builder()
+                .postList(userProfileDtos)
+                .totalCount(tagPosts.getTotalElements())
+                .build();
+    }
 }

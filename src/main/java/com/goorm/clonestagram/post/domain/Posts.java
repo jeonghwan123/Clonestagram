@@ -22,7 +22,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "posts")
-public class Posts extends BaseTimeEntity {
+public class Posts{
 
     public Posts(Long id) {
         this.id = id;
@@ -76,8 +76,8 @@ public class Posts extends BaseTimeEntity {
      * - 게시물이 업데이트 될 때 변경됨
      * - 처음 생성 시 null 가능
      */
-//    @Column(name = "updated_at")
-//    private LocalDateTime updatedAt;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "post")
     private List<Like> likes;
@@ -87,9 +87,9 @@ public class Posts extends BaseTimeEntity {
         this.createdAt = LocalDateTime.now();
     }
 
-//    @PreUpdate
-//    protected void onUpdate() {
-//        this.updatedAt = LocalDateTime.now();
-//    }
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 
 }

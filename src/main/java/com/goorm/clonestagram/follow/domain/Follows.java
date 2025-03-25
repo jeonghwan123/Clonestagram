@@ -1,11 +1,9 @@
 package com.goorm.clonestagram.follow.domain;
 
 
-import com.goorm.clonestagram.common.base.BaseTimeEntity;
 import com.goorm.clonestagram.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -15,23 +13,27 @@ import java.time.LocalDateTime;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Follows extends BaseTimeEntity {
+public class Follows {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "follower")
+    @JoinColumn(name = "follower_id")
     private User fromUser;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "following")
+    @JoinColumn(name = "following_id")
     private User toUser;
 
-    @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 
     public Follows(User fromUser, User toUser) {
         this.fromUser = fromUser;

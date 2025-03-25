@@ -18,13 +18,8 @@ import java.util.stream.Collectors;
 public class CommentController {
     private final CommentService commentService;
 
-    @GetMapping("/")
-    public String index() {
-        log.info("index");
-        return "Welcome to Clonestagram!";
-    }
 
-    @GetMapping("/post/{id}")
+    @GetMapping("/{id}")
     public CommentResponse getCommentById(@PathVariable Long id){
         CommentEntity entity = commentService.getCommentById(id);
 
