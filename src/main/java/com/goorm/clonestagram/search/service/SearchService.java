@@ -34,7 +34,7 @@ public class SearchService {
      */
     public SearchUserResDto searchUserByKeyword(String keyword, Pageable pageable) {
         //1. 유저의 이름으로 관련된 데이터 모두 반환, Like 사용
-        Page<User> users = userRepository.findAllByUsernameContaining(keyword, pageable);
+        Page<User> users = userRepository.findAllByUsernameContainingAndDeletedIsFalse(keyword, pageable);
 
         //2. 반환을 위해 users를 UserProfileDto형태로 변환
         Page<UserProfileDto> userProfileDtos = users.map(user -> UserProfileDto.builder()

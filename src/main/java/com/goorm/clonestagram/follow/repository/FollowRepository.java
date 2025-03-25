@@ -37,10 +37,10 @@ public interface FollowRepository extends JpaRepository<Follows, Long> {
     @Query("SELECT COUNT(f) FROM Follows f WHERE f.fromUser.id = :userId")
     int getFollowingCount(@Param("userId") Long userId);
 
-    @Query("SELECT f.toUser FROM Follows f WHERE f.fromUser.id = :fromUserId AND f.toUser.username LIKE %:keyword%")
+    @Query("SELECT f.toUser FROM Follows f WHERE f.fromUser.id = :fromUserId AND f.toUser.username LIKE %:keyword% AND f.toUser.deleted = false")
     Page<User> findFollowingByKeyword(@Param("fromUserId") Long fromUserId, @Param("keyword") String keyword, Pageable pageable);
 
-    @Query("SELECT f.fromUser FROM Follows f WHERE f.toUser.id = :toUserId AND f.fromUser.username LIKE %:keyword%")
+    @Query("SELECT f.fromUser FROM Follows f WHERE f.toUser.id = :toUserId AND f.fromUser.username LIKE %:keyword% AND f.fromUser.deleted = false")
     Page<User> findFollowerByKeyword(@Param("toUserId") Long toUserId, @Param("keyword") String keyword, Pageable pageable);
 
 
