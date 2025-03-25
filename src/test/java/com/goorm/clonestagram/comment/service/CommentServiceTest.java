@@ -1,11 +1,10 @@
 package com.goorm.clonestagram.comment.service;
 
 import com.goorm.clonestagram.comment.domain.CommentEntity;
-import com.goorm.clonestagram.comment.service.CommentService;
 import com.goorm.clonestagram.comment.repository.CommentRepository;
-import com.goorm.clonestagram.file.ContentType;
-import com.goorm.clonestagram.file.domain.Posts;
-import com.goorm.clonestagram.file.repository.PostsRepository;
+import com.goorm.clonestagram.post.ContentType;
+import com.goorm.clonestagram.post.domain.Posts;
+import com.goorm.clonestagram.post.repository.PostsRepository;
 import com.goorm.clonestagram.user.domain.User;
 import com.goorm.clonestagram.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,31 +43,11 @@ class CommentServiceTest {
     private CommentEntity mockComment;
 
     private Posts mockPost;
+    private Posts mockPost2;
 
 
     @BeforeEach
     void setUp() {
-        mockComment = CommentEntity.builder()
-                .id(1L)
-                .userId(5L)
-                .postId(200L)
-                .content("Test Comment")
-                .build();
-
-        mockComments = Arrays.asList(
-                CommentEntity.builder()
-                        .id(1L)
-                        .postId(100L)
-                        .userId(1L)
-                        .content("첫 번째 댓글")
-                        .build(),
-                CommentEntity.builder()
-                        .id(2L)
-                        .postId(100L)
-                        .userId(2L)
-                        .content("두 번째 댓글")
-                        .build()
-        );
         User mockUser = User.builder()
                 .id(5L)
                 .username("mockuser")
@@ -83,6 +62,39 @@ class CommentServiceTest {
                 .mediaName("test.jpg")
                 .contentType(ContentType.IMAGE)
                 .build();
+
+        mockPost2 = Posts.builder()
+                .id(100L)
+                .user(mockUser)
+                .content("Test Post")
+                .mediaName("test.jpg")
+                .contentType(ContentType.IMAGE)
+                .build();
+
+        mockComment = CommentEntity.builder()
+                .id(1L)
+                .user(mockUser)
+                .posts(mockPost2)
+                .content("Test Comment")
+                .build();
+
+        mockComments = Arrays.asList(
+                CommentEntity.builder()
+                        .id(1L)
+                        .posts(mockPost2)
+                        .user(mockUser)
+                        .content("첫 번째 댓글")
+                        .build(),
+                CommentEntity.builder()
+                        .id(2L)
+                        .posts(mockPost2)
+                        .user(mockUser)
+                        .content("두 번째 댓글")
+                        .build()
+        );
+
+
+
     }
 
     /**
@@ -133,7 +145,7 @@ class CommentServiceTest {
     void createComment_ShouldThrowException_WhenPostDoesNotExist() {
         // Given: 특정 postId (mockComment의 postId)에 대해 false 반환 (게시글이 존재하지 않도록 설정)
         when(userRepository.existsById(anyLong())).thenReturn(true);
-        when(postRepository.existsById(mockComment.getPostId())).thenReturn(false);
+        when(postRepository.existsById(mockComment.getPosts().getId())).thenReturn(false);
 
         // When & Then: 예외 발생 여부 확인
         Exception exception = assertThrows(IllegalArgumentException.class,
@@ -143,7 +155,7 @@ class CommentServiceTest {
         assertTrue(exception.getMessage().contains("존재하지 않는 게시글 ID입니다"));
 
         // Verify: postRepository.existsById()가 1번 호출되었는지 확인
-        verify(postRepository, times(1)).existsById(mockComment.getPostId());
+        verify(postRepository, times(1)).existsById(mockComment.getPosts().getId());
         // Verify: commentRepository.save()가 호출되지 않았는지 확인
         verify(commentRepository, never()).save(any(CommentEntity.class));
     }
@@ -221,7 +233,7 @@ class CommentServiceTest {
         when(postRepository.existsById(100L)).thenReturn(true);
 
         // Given: postId=100에 대한 댓글 목록을 반환하도록 설정
-        when(commentRepository.findByPostId(100L)).thenReturn(mockComments);
+        when(commentRepository.findByPostsId(100L)).thenReturn(mockComments);
 
         // When: postId=100으로 댓글 목록 조회
         List<CommentEntity> comments = commentService.getCommentsByPostId(100L);
@@ -233,7 +245,7 @@ class CommentServiceTest {
         assertEquals("두 번째 댓글", comments.get(1).getContent());
 
         // Verify: commentRepository.findByPostId()가 1번 호출되었는지 확인
-        verify(commentRepository, times(1)).findByPostId(100L);
+        verify(commentRepository, times(1)).findByPostsId(100L);
     }
 
     @Test
@@ -253,14 +265,14 @@ class CommentServiceTest {
         // Verify: postRepository.existsById()가 1번 호출되었는지 확인
         verify(postRepository, times(1)).existsById(999L);
         // Verify: commentRepository.findByPostId()가 호출되지 않았는지 확인
-        verify(commentRepository, never()).findByPostId(anyLong());
+        verify(commentRepository, never()).findByPostsId(anyLong());
     }
 
     @Test
     void getCommentsByPostId_ShouldThrowException_WhenNoCommentsExist() {
         // Given: postId=100은 존재하지만, 해당 게시글에 댓글이 없음
         when(postRepository.existsById(100L)).thenReturn(true);
-        when(commentRepository.findByPostId(100L)).thenReturn(Collections.emptyList());
+        when(commentRepository.findByPostsId(100L)).thenReturn(Collections.emptyList());
 
         // When & Then: 예외 발생 여부 확인
         Exception exception = assertThrows(IllegalArgumentException.class,
@@ -274,7 +286,7 @@ class CommentServiceTest {
         // Verify: postRepository.existsById()가 1번 호출되었는지 확인
         verify(postRepository, times(1)).existsById(100L);
         // Verify: commentRepository.findByPostId()가 1번 호출되었는지 확인
-        verify(commentRepository, times(1)).findByPostId(100L);
+        verify(commentRepository, times(1)).findByPostsId(100L);
     }
 
 

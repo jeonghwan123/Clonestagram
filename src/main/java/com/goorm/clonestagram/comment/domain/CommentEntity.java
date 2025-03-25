@@ -1,6 +1,6 @@
 package com.goorm.clonestagram.comment.domain;
 
-import com.goorm.clonestagram.file.domain.Posts;
+import com.goorm.clonestagram.post.domain.Posts;
 import com.goorm.clonestagram.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -23,10 +23,10 @@ public class CommentEntity {
     private Long id;
 
     @ManyToOne
-    private User userId;
+    private User user;
 
     @ManyToOne
-    private Posts postId;
+    private Posts posts;
 
     private String content;
 

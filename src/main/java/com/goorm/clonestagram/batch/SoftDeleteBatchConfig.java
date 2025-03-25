@@ -1,9 +1,9 @@
 package com.goorm.clonestagram.batch;
 
-import com.goorm.clonestagram.file.EntityType;
-import com.goorm.clonestagram.file.domain.SoftDelete;
-import com.goorm.clonestagram.file.repository.PostsRepository;
-import com.goorm.clonestagram.file.repository.SoftDeleteRepository;
+import com.goorm.clonestagram.post.EntityType;
+import com.goorm.clonestagram.post.domain.SoftDelete;
+import com.goorm.clonestagram.post.repository.PostsRepository;
+import com.goorm.clonestagram.post.repository.SoftDeleteRepository;
 import com.goorm.clonestagram.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;

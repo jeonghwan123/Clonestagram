@@ -26,8 +26,8 @@ public class CommentController {
         if(entity == null){ return CommentResponse.builder().build(); }
         return CommentResponse.builder()
                 .id(entity.getId())
-                .userId(entity.getUserId())
-                .postId(entity.getPostId())
+                .userId(entity.getUser().getId())
+                .postId(entity.getPosts().getId())
                 .content(entity.getContent())
                 .createdAt(entity.getCreatedAt())
                 .build();
@@ -42,8 +42,8 @@ public class CommentController {
         return entities.stream()
                 .map(entity -> CommentResponse.builder()
                         .id(entity.getId())
-                        .userId(entity.getUserId())
-                        .postId(entity.getPostId())
+                        .userId(entity.getUser().getId())
+                        .postId(entity.getPosts().getId())
                         .content(entity.getContent())
                         .createdAt(entity.getCreatedAt())
                         .build())
@@ -54,19 +54,12 @@ public class CommentController {
 
     @PostMapping
     public CommentResponse create(@RequestBody CommentRequest request) throws Exception{
-        CommentEntity entity = commentService.createCommentWithRollback(
-                CommentEntity.builder()
-                        .userId(request.getUserId())
-                        .postId(request.getPostId())
-                        .content(request.getContent())
-                        .createdAt(request.getCreatedAt())
-                        .build()
-        );
+        CommentEntity entity = commentService.createCommentWithRollback(request);
 
         return CommentResponse.builder()
                 .id(entity.getId())
-                .userId(entity.getUserId())
-                .postId(entity.getPostId())
+                .userId(entity.getUser().getId())
+                .postId(entity.getPosts().getId())
                 .content(entity.getContent())
                 .content(entity.getContent())
                 .createdAt(entity.getCreatedAt())

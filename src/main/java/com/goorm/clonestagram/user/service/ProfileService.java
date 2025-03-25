@@ -1,15 +1,15 @@
 package com.goorm.clonestagram.user.service;
 
-import com.goorm.clonestagram.file.EntityType;
-import com.goorm.clonestagram.file.domain.SoftDelete;
-import com.goorm.clonestagram.file.dto.PostInfoDto;
-import com.goorm.clonestagram.file.repository.PostsRepository;
-import com.goorm.clonestagram.file.repository.SoftDeleteRepository;
-import com.goorm.clonestagram.file.service.ImageService;
+import com.goorm.clonestagram.post.EntityType;
+import com.goorm.clonestagram.post.domain.SoftDelete;
+import com.goorm.clonestagram.post.repository.SoftDeleteRepository;
+import com.goorm.clonestagram.post.dto.PostInfoDto;
+import com.goorm.clonestagram.post.repository.PostsRepository;
+import com.goorm.clonestagram.post.service.ImageService;
 import com.goorm.clonestagram.follow.repository.FollowRepository;
 import com.goorm.clonestagram.user.domain.User;
-import com.goorm.clonestagram.file.dto.upload.ImageUploadReqDto;
-import com.goorm.clonestagram.file.dto.upload.ImageUploadResDto;
+import com.goorm.clonestagram.post.dto.upload.ImageUploadReqDto;
+import com.goorm.clonestagram.post.dto.upload.ImageUploadResDto;
 import com.goorm.clonestagram.user.dto.UserProfileDto;
 import com.goorm.clonestagram.user.dto.UserProfileUpdateDto;
 import com.goorm.clonestagram.user.repository.UserRepository;
@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 사용자 프로필 관련 비즈니스 로직을 처리하는 서비스 클래스
@@ -79,28 +78,28 @@ public class ProfileService {
     }
 
 
-/**
- * 사용자 프로필 수정
- * @param userId 수정할 사용자의 ID
- * @param userProfileUpdateDto 수정할 프로필 정보
- * @return 수정된 사용자 객체
- * @throws IllegalArgumentException 사용자가 존재하지 않으면 예외 발생
- */
-@Transactional // 트랜잭션을 관리하여 데이터 무결성을 보장
-public UserProfileDto updateUserProfile(Long userId, UserProfileUpdateDto userProfileUpdateDto) {
-    // 사용자 정보를 DB에서 조회, 존재하지 않으면 예외 발생
-    User user = userRepository.findById(userId)
-            .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    /**
+     * 사용자 프로필 수정
+     * @param userId 수정할 사용자의 ID
+     * @param userProfileUpdateDto 수정할 프로필 정보
+     * @return 수정된 사용자 객체
+     * @throws IllegalArgumentException 사용자가 존재하지 않으면 예외 발생
+     */
+    @Transactional // 트랜잭션을 관리하여 데이터 무결성을 보장
+    public UserProfileDto updateUserProfile(Long userId, UserProfileUpdateDto userProfileUpdateDto) {
+        // 사용자 정보를 DB에서 조회, 존재하지 않으면 예외 발생
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-    // 사용자명 업데이트
-    if (userProfileUpdateDto.getUsername() != null && !userProfileUpdateDto.getUsername().isEmpty()) {
-        user.setUsername(userProfileUpdateDto.getUsername());
-    }
+        // 사용자명 업데이트
+        if (userProfileUpdateDto.getUsername() != null && !userProfileUpdateDto.getUsername().isEmpty()) {
+            user.setUsername(userProfileUpdateDto.getUsername());
+        }
 
-    // 이메일 업데이트
-    if (userProfileUpdateDto.getEmail() != null && !userProfileUpdateDto.getEmail().isEmpty()) {
-        user.setEmail(userProfileUpdateDto.getEmail());
-    }
+        // 이메일 업데이트
+        if (userProfileUpdateDto.getEmail() != null && !userProfileUpdateDto.getEmail().isEmpty()) {
+            user.setEmail(userProfileUpdateDto.getEmail());
+        }
 
         /*
         // 비밀번호 업데이트 (추후 기능 추가 예정)
@@ -109,41 +108,41 @@ public UserProfileDto updateUserProfile(Long userId, UserProfileUpdateDto userPr
         }
         */
 
-    // 자기소개(bio) 업데이트
-    if (userProfileUpdateDto.getBio() != null && !userProfileUpdateDto.getBio().isEmpty()) {
-        user.setBio(userProfileUpdateDto.getBio());
-    }
-
-    // 프로필 이미지 업데이트
-    if (userProfileUpdateDto.getProfileImage() != null && !userProfileUpdateDto.getProfileImage().isEmpty()) {
-        // MultipartFile을 ImageUploadReqDto로 변환하여 이미지 업로드 요청
-        ImageUploadReqDto imageUploadReqDto = new ImageUploadReqDto();
-        imageUploadReqDto.setFile(userProfileUpdateDto.getProfileImage());  // MultipartFile을 set
-
-        try {
-            // 이미지 업로드 서비스 호출
-            ImageUploadResDto imageUploadResDto = imageService.imageUpload(imageUploadReqDto, user.getId());
-
-            // 이미지 URL 생성 (업로드된 파일 이름을 사용하여 경로 설정)
-            String imageUrl = uploadFolder + imageUploadResDto.getMediaName(); // 적합한 경로를 설정
-
-            // 프로필 이미지 URL로 업데이트
-            user.setProfileimg(imageUrl);
-        } catch (Exception e) {
-            // 예외 처리: 예외 메시지 로그 출력, 사용자에게 에러 메시지 전달 등
-            e.printStackTrace();
-            throw new RuntimeException("프로필 이미지 업로드 실패: " + e.getMessage());
+        // 자기소개(bio) 업데이트
+        if (userProfileUpdateDto.getBio() != null && !userProfileUpdateDto.getBio().isEmpty()) {
+            user.setBio(userProfileUpdateDto.getBio());
         }
-    }
 
-    // 변경된 사용자 정보 저장 후 반환
-    User updatedUser = userRepository.save(user);
+        // 프로필 이미지 업데이트
+        if (userProfileUpdateDto.getProfileImage() != null && !userProfileUpdateDto.getProfileImage().isEmpty()) {
+            // MultipartFile을 ImageUploadReqDto로 변환하여 이미지 업로드 요청
+            ImageUploadReqDto imageUploadReqDto = new ImageUploadReqDto();
+            imageUploadReqDto.setFile(userProfileUpdateDto.getProfileImage());  // MultipartFile을 set
 
-    return UserProfileDto.builder()
-            .username(updatedUser.getUsername())
-            .profileimg(updatedUser.getProfileimg())
-            .bio(updatedUser.getBio())
-            .build();
+            try {
+                // 이미지 업로드 서비스 호출
+                ImageUploadResDto imageUploadResDto = imageService.imageUpload(imageUploadReqDto, user.getId());
+
+                // 이미지 URL 생성 (업로드된 파일 이름을 사용하여 경로 설정)
+                String imageUrl = uploadFolder + imageUploadResDto.getMediaName(); // 적합한 경로를 설정
+
+                // 프로필 이미지 URL로 업데이트
+                user.setProfileimg(imageUrl);
+            } catch (Exception e) {
+                // 예외 처리: 예외 메시지 로그 출력, 사용자에게 에러 메시지 전달 등
+                e.printStackTrace();
+                throw new RuntimeException("프로필 이미지 업로드 실패: " + e.getMessage());
+            }
+        }
+
+        // 변경된 사용자 정보 저장 후 반환
+        User updatedUser = userRepository.save(user);
+
+        return UserProfileDto.builder()
+                .username(updatedUser.getUsername())
+                .profileimg(updatedUser.getProfileimg())
+                .bio(updatedUser.getBio())
+                .build();
     }
 
     public void deleteUserProfile(Long userId) {

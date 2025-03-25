@@ -1,6 +1,6 @@
 package com.goorm.clonestagram.hashtag.repository;
 
-import com.goorm.clonestagram.file.domain.Posts;
+import com.goorm.clonestagram.post.domain.Posts;
 import com.goorm.clonestagram.hashtag.entity.PostHashTags;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

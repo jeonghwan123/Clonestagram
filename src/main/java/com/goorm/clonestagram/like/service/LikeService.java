@@ -1,9 +1,8 @@
 package com.goorm.clonestagram.like.service;
 
-import com.goorm.clonestagram.file.domain.Posts;
-import com.goorm.clonestagram.file.repository.PostsRepository;
+import com.goorm.clonestagram.post.domain.Posts;
+import com.goorm.clonestagram.post.repository.PostsRepository;
 import com.goorm.clonestagram.like.domain.Like;
-import com.goorm.clonestagram.like.dto.LikeDto;
 import com.goorm.clonestagram.like.repository.LikeRepository;
 import com.goorm.clonestagram.user.domain.User;
 import com.goorm.clonestagram.user.repository.UserRepository;
@@ -11,8 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -31,14 +28,14 @@ public class LikeService {
                 .orElseThrow(() -> new IllegalArgumentException("게시물을 찾을 수 없습니다."));
 
         // userId와 postId를 사용해 좋아요 여부 확인
-        Optional<Like> existingLike = likeRepository.findByUserIdAndPostId(userId, postId);
+        Optional<Like> existingLike = likeRepository.findByUserIdAndPostsId(userId, postId);
 
         if (existingLike.isPresent()) {
             likeRepository.delete(existingLike.get()); // 좋아요 취소
         } else {
             Like like = new Like();
             like.setUser(user);
-            like.setPost(post);
+            like.setPosts(post);
             likeRepository.save(like); // 좋아요 추가
         }
     }
@@ -46,6 +43,6 @@ public class LikeService {
 
     // 특정 게시물에 대한 좋아요 개수 조회
     public Long getLikeCount(Long postId) {
-        return likeRepository.countByPostId(postId);
+        return likeRepository.countByPostsId(postId);
     }
 }
