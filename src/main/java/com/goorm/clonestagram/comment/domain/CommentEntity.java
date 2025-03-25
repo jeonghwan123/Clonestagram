@@ -1,5 +1,7 @@
 package com.goorm.clonestagram.comment.domain;
 
+import com.goorm.clonestagram.file.domain.Posts;
+import com.goorm.clonestagram.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,8 +21,19 @@ public class CommentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long userId;
-    private Long postId;
+
+    @ManyToOne
+    private User userId;
+
+    @ManyToOne
+    private Posts postId;
+
     private String content;
+
     private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }
