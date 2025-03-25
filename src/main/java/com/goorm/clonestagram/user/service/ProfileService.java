@@ -69,7 +69,10 @@ public class ProfileService {
         // 조회된 사용자 정보를 DTO로 변환하여 반환
         return UserProfileDto.builder()
                 .username(user.getUsername())
+                .email(user.getEmail())
                 .profileimg(user.getProfileimg())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
                 .bio(user.getBio())
                 .followerCount(followerCount)
                 .followingCount(followingCount)
@@ -140,7 +143,10 @@ public class ProfileService {
 
         return UserProfileDto.builder()
                 .username(updatedUser.getUsername())
+                .email(updatedUser.getEmail())
                 .profileimg(updatedUser.getProfileimg())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
                 .bio(updatedUser.getBio())
                 .build();
     }
