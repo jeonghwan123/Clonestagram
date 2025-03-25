@@ -1,6 +1,5 @@
 package com.goorm.clonestagram.like.domain;
 
-import com.goorm.clonestagram.common.base.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import com.goorm.clonestagram.user.domain.User;
@@ -27,9 +26,9 @@ public class Like {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
-    private Posts post;
+    private Posts posts;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
@@ -37,9 +36,9 @@ public class Like {
         this.createdAt = LocalDateTime.now();
     }
 
-    public Like(User user, Posts post) {
+    public Like(User user, Posts posts) {
         this.user = user;
-        this.post = post;
+        this.posts = posts;
         this.createdAt = LocalDateTime.now();
     }
 }

@@ -1,10 +1,13 @@
 package com.goorm.clonestagram.post.service;
 
+import com.goorm.clonestagram.post.EntityType;
 import com.goorm.clonestagram.post.domain.Posts;
+import com.goorm.clonestagram.post.domain.SoftDelete;
 import com.goorm.clonestagram.post.dto.update.ImageUpdateReqDto;
 import com.goorm.clonestagram.post.dto.update.ImageUpdateResDto;
 import com.goorm.clonestagram.post.dto.upload.ImageUploadReqDto;
 import com.goorm.clonestagram.post.dto.upload.ImageUploadResDto;
+import com.goorm.clonestagram.post.repository.SoftDeleteRepository;
 import com.goorm.clonestagram.post.repository.PostsRepository;
 import com.goorm.clonestagram.follow.repository.FollowRepository;
 import com.goorm.clonestagram.hashtag.entity.HashTags;
@@ -23,6 +26,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
@@ -40,9 +44,9 @@ public class ImageService {
     private final UserRepository userRepository;
     private final HashTagRepository hashTagRepository;
     private final PostHashTagRepository postHashTagRepository;
+    private final SoftDeleteRepository softDeleteRepository;
     private final FeedService feedService;
     private final FollowRepository followRepository; // 사용자의 팔로워를 조회하기 위함
-
 
     @Value("${image.path}")
     private String uploadFolder;
@@ -60,7 +64,7 @@ public class ImageService {
     public ImageUploadResDto imageUpload(ImageUploadReqDto imageUploadReqDto, Long userId) throws Exception {
 
         User user = userRepository.findById(userId)
-               .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
 
         //1. unique 파일명을 생성하기 위해 uuid 사용
         UUID uuid = UUID.randomUUID();
@@ -81,11 +85,11 @@ public class ImageService {
         Posts postEntity = imageUploadReqDto.toEntity(imageFileName, user);
         Posts post = postsRepository.save(postEntity);
         // 피드 생성 로직 추가
-        feedService.createFeedForFollowers(post); // post.getUser().getId() 기반으로 팔로워 조회
+        feedService.createFeedForFollowers(post); // posts.getUser().getId() 기반으로 팔로워 조회
 
         //5. Dto에 있는 HashTagList를 저장
         for (String tagContent : Optional.ofNullable(imageUploadReqDto.getHashTagList())
-                                        .orElse(Collections.emptyList())) {
+                .orElse(Collections.emptyList())) {
             //5-1. tagList에서 tag 내용 하나를 추출한 후 조회
             HashTags tag = hashTagRepository.findByTagContent(tagContent)
                     //5-2. tag가 저장되어 있지 않으면 새롭게 저장
@@ -172,7 +176,7 @@ public class ImageService {
 
             //4-2. 새롭게 해시 태그 리스트 저장
             for (String tagContent : Optional.ofNullable(imageUpdateReqDto.getHashTagList())
-                                          .orElse(Collections.emptyList())) {
+                    .orElse(Collections.emptyList())) {
                 //4-2. tagList에서 tag 내용 하나를 추출한 후 조회
                 HashTags tag = hashTagRepository.findByTagContent(tagContent)
                         //4-2. tag가 저장되어 있지 않으면 새롭게 저장
@@ -207,7 +211,7 @@ public class ImageService {
     public void imageDelete(Long postSeq, Long userId) {
         //1. 식별자를 토대로 게시글 찾아 반환
         Posts posts = postsRepository.findById(postSeq)
-                        .orElseThrow(() -> new IllegalArgumentException("해당 게시물이 없습니다"));
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시물이 없습니다"));
 
         if(!posts.getUser().getId().equals(userId)){
             throw new IllegalArgumentException("권한이 없는 유저입니다");
@@ -222,7 +226,9 @@ public class ImageService {
         }
 
         //3. DB에서 데이터 삭제
-        postsRepository.delete(posts);
+        posts.setDeleted(true);
+        posts.setDeletedAt(LocalDateTime.now());
+        softDeleteRepository.save(new SoftDelete(null, EntityType.POST, posts.getId(), posts.getDeletedAt()));
         postHashTagRepository.deleteAllByPostsId(posts.getId());
 
         // 피드 삭제 로직 추가

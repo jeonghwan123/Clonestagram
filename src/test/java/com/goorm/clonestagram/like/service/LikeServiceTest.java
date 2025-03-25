@@ -42,7 +42,7 @@ public class LikeServiceTest {
         user.setId(1L);
         user.setUsername("user1");
 
-        // Test post
+        // Test posts
         post = new Posts();
         post.setId(1L);
         post.setContent("Test Post");
@@ -50,10 +50,10 @@ public class LikeServiceTest {
 
     @Test
     public void testToggleLikeAddLike() {
-        // Given: User and post are available, and no existing like in the database.
+        // Given: User and posts are available, and no existing like in the database.
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(postRepository.findById(1L)).thenReturn(Optional.of(post));
-        when(likeRepository.findByUserIdAndPostId(1L, 1L)).thenReturn(Optional.empty());  // No like exists
+        when(likeRepository.findByUserIdAndPostsId(1L, 1L)).thenReturn(Optional.empty());  // No like exists
 
         // When: User toggles like
         likeService.toggleLike(1L, 1L);
@@ -65,14 +65,14 @@ public class LikeServiceTest {
 
     @Test
     public void testToggleLikeRemoveLike() {
-        // Given: User and post are available, and existing like is found in the database.
+        // Given: User and posts are available, and existing like is found in the database.
         Like existingLike = new Like();
         existingLike.setUser(user);
-        existingLike.setPost(post);
+        existingLike.setPosts(post);
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(postRepository.findById(1L)).thenReturn(Optional.of(post));
-        when(likeRepository.findByUserIdAndPostId(1L, 1L)).thenReturn(Optional.of(existingLike));  // Like already exists
+        when(likeRepository.findByUserIdAndPostsId(1L, 1L)).thenReturn(Optional.of(existingLike));  // Like already exists
 
         // When: User toggles like
         likeService.toggleLike(1L, 1L);

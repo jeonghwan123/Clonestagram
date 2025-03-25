@@ -5,6 +5,7 @@ import com.goorm.clonestagram.user.dto.UserProfileDto;
 import com.goorm.clonestagram.user.dto.UserProfileUpdateDto;
 import com.goorm.clonestagram.user.service.ProfileService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -57,12 +58,18 @@ public class ProfileController {
      * 수정된 사용자 정보를 클라이언트에게 반환합니다.
      */
     @PutMapping(path = "/{userId}/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)  // {userId}는 URL 경로에 포함되어 수정할 사용자 ID를 전달합니다.
-    public ResponseEntity<User> updateUserProfile(@PathVariable Long userId,
+    public ResponseEntity<UserProfileDto> updateUserProfile(@PathVariable Long userId,
                                                    UserProfileUpdateDto userProfileUpdateDto) {
         // 사용자가 입력한 수정 정보를 기반으로 프로필을 업데이트합니다.
-        User updatedUser = profileService.updateUserProfile(userId, userProfileUpdateDto);
+        UserProfileDto userProfileDto = profileService.updateUserProfile(userId, userProfileUpdateDto);
 
         // 수정된 사용자 정보를 클라이언트에게 전달합니다.
-        return ResponseEntity.ok(updatedUser);  // HTTP 200 OK 상태로 수정된 정보를 반환합니다.
+        return ResponseEntity.ok(userProfileDto);  // HTTP 200 OK 상태로 수정된 정보를 반환합니다.
+    }
+
+    @DeleteMapping(path = "/{userId}/profile")  // {userId}는 URL 경로에 포함되어 수정할 사용자 ID를 전달합니다.
+    public ResponseEntity<?> deleteUserProfile(@PathVariable Long userId){
+        profileService.deleteUserProfile(userId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

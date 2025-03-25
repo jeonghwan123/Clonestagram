@@ -1,8 +1,10 @@
 package com.goorm.clonestagram.comment.service;
 import com.goorm.clonestagram.comment.domain.CommentEntity;
+import com.goorm.clonestagram.comment.dto.CommentRequest;
 import com.goorm.clonestagram.post.domain.Posts;
 import com.goorm.clonestagram.post.repository.PostsRepository;
 import com.goorm.clonestagram.comment.repository.CommentRepository;
+import com.goorm.clonestagram.user.domain.User;
 import com.goorm.clonestagram.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,13 +27,13 @@ public class CommentService {
     public CommentEntity createComment(CommentEntity comment) {
 
         // ✅ userId가 존재하는지 확인
-        if (!userRepository.existsById(comment.getUserId())) {
-            throw new IllegalArgumentException("존재하지 않는 사용자 ID입니다: " + comment.getUserId());
+        if (!userRepository.existsById(comment.getUser().getId())) {
+            throw new IllegalArgumentException("존재하지 않는 사용자 ID입니다: " + comment.getUser().getId());
         }
 
         // ✅ postId가 존재하는지 확인
-        if (!postsRepository.existsById(comment.getPostId())) {
-            throw new IllegalArgumentException("존재하지 않는 게시글 ID입니다: " + comment.getPostId());
+        if (!postsRepository.existsById(comment.getPosts().getId())) {
+            throw new IllegalArgumentException("존재하지 않는 게시글 ID입니다: " + comment.getPosts().getId());
         }
 
         return commentRepository.save(comment);
@@ -39,8 +41,18 @@ public class CommentService {
 
 
     @Transactional
-    public CommentEntity createCommentWithRollback(CommentEntity entity) {
-        return commentRepository.save(entity);
+    public CommentEntity createCommentWithRollback(CommentRequest commentRequest) {
+        User user = userRepository.findById(commentRequest.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("유저가 없습니다"));
+        Posts posts = postsRepository.findById(commentRequest.getPostId())
+                .orElseThrow(() -> new IllegalArgumentException("유저가 없습니다"));
+
+        return commentRepository.save(CommentEntity.builder()
+                .user(user)
+                .posts(posts)
+                .content(commentRequest.getContent())
+                .createdAt(commentRequest.getCreatedAt())
+                .build());
     }
 
 
@@ -58,7 +70,7 @@ public class CommentService {
             throw new IllegalArgumentException("존재하지 않는 게시글 ID입니다: " + postId);
         }
 
-        List<CommentEntity> comments = commentRepository.findByPostId(postId);
+        List<CommentEntity> comments = commentRepository.findByPostsId(postId);
 
 
 
@@ -80,12 +92,12 @@ public class CommentService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글 ID입니다: " + commentId));
 
         // 2️⃣ 해당 댓글이 속한 게시글 조회 (✔ postId 사용)
-        Long postId = comment.getPostId(); // ✅ comment에서 postId 가져오기
+        Long postId = comment.getPosts().getId(); // ✅ comment에서 postId 가져오기
         Posts post = postsRepository.findById(postId) // ✅ postId 기반 조회
                 .orElseThrow(() -> new IllegalArgumentException("댓글이 속한 게시글이 존재하지 않습니다. postId: " + postId));
 
         // 3️⃣ 댓글 삭제 권한 확인 (댓글 작성자 또는 게시글 작성자)
-        if (!comment.getUserId().equals(requesterId) && !post.getUser().getId().equals(requesterId)) {
+        if (!comment.getUser().getId().equals(requesterId) && !post.getUser().getId().equals(requesterId)) {
             throw new IllegalArgumentException("댓글을 삭제할 권한이 없습니다. 요청자 ID: " + requesterId);
         }
 

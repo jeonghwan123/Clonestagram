@@ -1,5 +1,8 @@
 package com.goorm.clonestagram.post.service;
 
+import com.goorm.clonestagram.post.EntityType;
+import com.goorm.clonestagram.post.domain.SoftDelete;
+import com.goorm.clonestagram.post.repository.SoftDeleteRepository;
 import com.goorm.clonestagram.feed.service.FeedService;
 import com.goorm.clonestagram.post.domain.Posts;
 import com.goorm.clonestagram.post.dto.update.VideoUpdateReqDto;
@@ -22,6 +25,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
@@ -39,6 +43,7 @@ public class VideoService {
     private final UserRepository userRepository;
     private final HashTagRepository hashTagRepository;
     private final PostHashTagRepository postHashTagRepository;
+    private final SoftDeleteRepository softDeleteRepository;
     private final FeedService feedService;
 
     @Value("${video.path}")
@@ -80,7 +85,7 @@ public class VideoService {
 
         //5. Dto에 있는 HashTagList를 저장
         for (String tagContent : Optional.ofNullable(videoUploadReqDto.getHashTagList())
-                                        .orElse(Collections.emptyList())) {
+                .orElse(Collections.emptyList())) {
             //5-1. tagList에서 tag 내용 하나를 추출한 후 조회
             HashTags tag = hashTagRepository.findByTagContent(tagContent)
                     //5-2. tag가 저장되어 있지 않으면 새롭게 저장
@@ -168,7 +173,7 @@ public class VideoService {
 
             //4-2. 새롭게 해시 태그 리스트 저장
             for (String tagContent : Optional.ofNullable(videoUpdateReqDto.getHashTagList())
-                                            .orElse(Collections.emptyList())) {
+                    .orElse(Collections.emptyList())) {
                 //4-2. tagList에서 tag 내용 하나를 추출한 후 조회
                 HashTags tag = hashTagRepository.findByTagContent(tagContent)
                         //4-2. tag가 저장되어 있지 않으면 새롭게 저장
@@ -218,7 +223,9 @@ public class VideoService {
         }
 
         //3. DB에서 데이터 삭제
-        postsRepository.delete(posts);
+        posts.setDeleted(true);
+        posts.setDeletedAt(LocalDateTime.now());
+        softDeleteRepository.save(new SoftDelete(null, EntityType.POST, posts.getId(), posts.getDeletedAt()));
         postHashTagRepository.deleteAllByPostsId(posts.getId());
 
         // 피드 삭제 로직 추가
