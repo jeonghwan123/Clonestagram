@@ -1,7 +1,7 @@
 package com.goorm.clonestagram.like.service;
 
-import com.goorm.clonestagram.file.domain.Posts;
-import com.goorm.clonestagram.file.repository.PostsRepository;
+import com.goorm.clonestagram.post.domain.Posts;
+import com.goorm.clonestagram.post.repository.PostsRepository;
 import com.goorm.clonestagram.like.domain.Like;
 import com.goorm.clonestagram.like.repository.LikeRepository;
 import com.goorm.clonestagram.user.domain.User;
@@ -15,8 +15,6 @@ import org.mockito.MockitoAnnotations;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class LikeServiceTest {
 

@@ -1,7 +1,7 @@
 package com.goorm.clonestagram.comment.service;
 import com.goorm.clonestagram.comment.domain.CommentEntity;
-import com.goorm.clonestagram.file.domain.Posts;
-import com.goorm.clonestagram.file.repository.PostsRepository;
+import com.goorm.clonestagram.post.domain.Posts;
+import com.goorm.clonestagram.post.repository.PostsRepository;
 import com.goorm.clonestagram.comment.repository.CommentRepository;
 import com.goorm.clonestagram.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

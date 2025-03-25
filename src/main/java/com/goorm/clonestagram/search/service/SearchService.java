@@ -1,7 +1,7 @@
 package com.goorm.clonestagram.search.service;
 
-import com.goorm.clonestagram.file.domain.Posts;
-import com.goorm.clonestagram.file.dto.PostInfoDto;
+import com.goorm.clonestagram.post.domain.Posts;
+import com.goorm.clonestagram.post.dto.PostInfoDto;
 import com.goorm.clonestagram.follow.repository.FollowRepository;
 import com.goorm.clonestagram.hashtag.repository.PostHashTagRepository;
 import com.goorm.clonestagram.search.dto.SearchPostResDto;

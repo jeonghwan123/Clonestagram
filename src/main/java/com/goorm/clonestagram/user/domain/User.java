@@ -2,7 +2,7 @@ package com.goorm.clonestagram.user.domain;
 
 
 import com.goorm.clonestagram.common.base.BaseTimeEntity;
-import com.goorm.clonestagram.file.domain.Posts;
+import com.goorm.clonestagram.post.domain.Posts;
 import com.goorm.clonestagram.follow.domain.Follows;
 import com.goorm.clonestagram.like.domain.Like;
 import jakarta.persistence.*;
