@@ -1,7 +1,10 @@
 package com.goorm.clonestagram.user.service;
 
+import com.goorm.clonestagram.file.EntityType;
+import com.goorm.clonestagram.file.domain.SoftDelete;
 import com.goorm.clonestagram.file.dto.PostInfoDto;
 import com.goorm.clonestagram.file.repository.PostsRepository;
+import com.goorm.clonestagram.file.repository.SoftDeleteRepository;
 import com.goorm.clonestagram.file.service.ImageService;
 import com.goorm.clonestagram.follow.repository.FollowRepository;
 import com.goorm.clonestagram.user.domain.User;
@@ -16,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,6 +36,7 @@ public class ProfileService {
     private final UserRepository userRepository;  // 사용자 정보를 관리하는 리포지토리
     private final ImageService imageService;      // 이미지 업로드를 처리하는 서비스
     private final PostsRepository postsRepository;
+    private final SoftDeleteRepository softDeleteRepository;
 
     @Value("${image.path}")
     private String uploadFolder;
@@ -64,7 +69,6 @@ public class ProfileService {
 
         // 조회된 사용자 정보를 DTO로 변환하여 반환
         return UserProfileDto.builder()
-                .id(user.getId())
                 .username(user.getUsername())
                 .profileimg(user.getProfileimg())
                 .bio(user.getBio())
@@ -83,7 +87,7 @@ public class ProfileService {
  * @throws IllegalArgumentException 사용자가 존재하지 않으면 예외 발생
  */
 @Transactional // 트랜잭션을 관리하여 데이터 무결성을 보장
-public User updateUserProfile(Long userId, UserProfileUpdateDto userProfileUpdateDto) {
+public UserProfileDto updateUserProfile(Long userId, UserProfileUpdateDto userProfileUpdateDto) {
     // 사용자 정보를 DB에서 조회, 존재하지 않으면 예외 발생
     User user = userRepository.findById(userId)
             .orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -133,8 +137,23 @@ public User updateUserProfile(Long userId, UserProfileUpdateDto userProfileUpdat
     }
 
     // 변경된 사용자 정보 저장 후 반환
-    return userRepository.save(user);
-}
+    User updatedUser = userRepository.save(user);
+
+    return UserProfileDto.builder()
+            .username(updatedUser.getUsername())
+            .profileimg(updatedUser.getProfileimg())
+            .bio(updatedUser.getBio())
+            .build();
+    }
+
+    public void deleteUserProfile(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        user.setDeleted(true);
+        user.setDeletedAt(LocalDateTime.now());
+        softDeleteRepository.save(new SoftDelete(null, EntityType.USER, user.getId(), user.getDeletedAt()));
+    }
 }
 
 
