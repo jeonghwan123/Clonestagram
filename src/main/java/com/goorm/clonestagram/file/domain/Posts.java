@@ -1,6 +1,6 @@
 package com.goorm.clonestagram.file.domain;
 
-import com.goorm.clonestagram.common.base.BaseTimeEntity;
+import com.goorm.clonestagram.comment.domain.CommentEntity;
 import com.goorm.clonestagram.file.ContentType;
 import com.goorm.clonestagram.like.domain.Like;
 import com.goorm.clonestagram.user.domain.User;
@@ -75,8 +75,17 @@ public class Posts{
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "post")
+    @Column(name = "deleted")
+    private Boolean deleted = false;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+    @OneToMany(mappedBy = "posts", cascade = CascadeType.REMOVE)
     private List<Like> likes;
+
+    @OneToMany(mappedBy = "posts", cascade = CascadeType.REMOVE)
+    private List<CommentEntity> comments;
 
     @PrePersist
     protected void onCreate() {
