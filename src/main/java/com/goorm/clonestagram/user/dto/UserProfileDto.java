@@ -18,6 +18,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 public class UserProfileDto {
+    private Long id;
     private String username;
     private String email;
     private String bio;

@@ -69,6 +69,7 @@ public class ProfileService {
 
         // 조회된 사용자 정보를 DTO로 변환하여 반환
         return UserProfileDto.builder()
+                .id(user.getId())
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .profileimg(user.getProfileimg())

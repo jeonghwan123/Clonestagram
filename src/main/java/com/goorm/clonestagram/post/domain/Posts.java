@@ -6,6 +6,8 @@ import com.goorm.clonestagram.like.domain.Like;
 import com.goorm.clonestagram.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -68,6 +70,7 @@ public class Posts{
      * 게시물 생성 시간
      * - imageUploadReqDto.toEntity()에서 셋팅
      */
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -76,6 +79,7 @@ public class Posts{
      * - 게시물이 업데이트 될 때 변경됨
      * - 처음 생성 시 null 가능
      */
+    @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
@@ -96,12 +100,6 @@ public class Posts{
         if (this.deleted == null) {
             this.deleted = false;
         }
-        this.createdAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
     }
 
 }

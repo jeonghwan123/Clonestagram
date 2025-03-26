@@ -70,7 +70,7 @@ public class ProfileServiceIntegrationTest {
         updateDto.setBio("Updated bio");
 
         // 이미지 업로드는 Mock 처리해야 할 수 있음, 테스트 목적상 필드값만 업데이트
-        User updatedUser = profileService.updateUserProfile(testUser.getId(), updateDto);
+        UserProfileDto updatedUser = profileService.updateUserProfile(testUser.getId(), updateDto);
 
         assertNotNull(updatedUser);
         assertEquals("updatedUser", updatedUser.getUsername());
@@ -85,7 +85,7 @@ public class ProfileServiceIntegrationTest {
         updateDto.setBio("Updated bio with image");
 
         // 실제 이미지 업로드는 Mock 처리할 수 있지만, 여기에선 이미지만 업데이트하는 테스트
-        User updatedUser = profileService.updateUserProfile(testUser.getId(), updateDto);
+        UserProfileDto updatedUser = profileService.updateUserProfile(testUser.getId(), updateDto);
 
         assertNotNull(updatedUser);
         assertEquals("userWithNewProfileImage", updatedUser.getUsername());

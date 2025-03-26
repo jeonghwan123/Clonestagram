@@ -53,7 +53,7 @@ public class LikeServiceIntegrationTest {
         likeService.toggleLike(user.getId(), post.getId());
 
         // Then: 좋아요가 제대로 생성되었는지 확인
-        Optional<Like> like = likeRepository.findByUserIdAndPostId(user.getId(), post.getId());
+        Optional<Like> like = likeRepository.findByUserIdAndPostsId(user.getId(), post.getId());
         assertTrue(like.isPresent(), "좋아요가 생성되어야 합니다.");
         assertEquals(1L, likeService.getLikeCount(post.getId()), "좋아요 개수가 1이어야 합니다.");
 
@@ -61,7 +61,7 @@ public class LikeServiceIntegrationTest {
         likeService.toggleLike(user.getId(), post.getId());
 
         // Then: 좋아요가 제대로 취소되었는지 확인
-        like = likeRepository.findByUserIdAndPostId(user.getId(), post.getId());
+        like = likeRepository.findByUserIdAndPostsId(user.getId(), post.getId());
         assertFalse(like.isPresent(), "좋아요가 취소되어야 합니다.");
         assertEquals(0L, likeService.getLikeCount(post.getId()), "좋아요 개수가 0이어야 합니다.");
     }
