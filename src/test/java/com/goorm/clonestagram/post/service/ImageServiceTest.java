@@ -1,13 +1,17 @@
 package com.goorm.clonestagram.post.service;
 
 import com.goorm.clonestagram.feed.service.FeedService;
+import com.goorm.clonestagram.hashtag.repository.PostHashTagRepository;
 import com.goorm.clonestagram.post.ContentType;
+import com.goorm.clonestagram.post.EntityType;
 import com.goorm.clonestagram.post.domain.Posts;
+import com.goorm.clonestagram.post.domain.SoftDelete;
 import com.goorm.clonestagram.post.dto.update.ImageUpdateReqDto;
 import com.goorm.clonestagram.post.dto.update.ImageUpdateResDto;
 import com.goorm.clonestagram.post.dto.upload.ImageUploadReqDto;
 import com.goorm.clonestagram.post.dto.upload.ImageUploadResDto;
 import com.goorm.clonestagram.post.repository.PostsRepository;
+import com.goorm.clonestagram.post.repository.SoftDeleteRepository;
 import com.goorm.clonestagram.user.domain.User;
 import com.goorm.clonestagram.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +37,7 @@ import static org.mockito.Mockito.*;
 //Todo 로그인 구현 완료 후 유저를 포함하여 테스트 필요
 class ImageServiceTest {
 
-    private String uploadFolder = "src/main/resources/static/uploads/image/";
+    private String uploadFolder = "uploads/image/";
 
     private ImageUploadReqDto imageUploadReqDto;
     private ImageUpdateReqDto imageUpdateReqDto;
@@ -47,6 +51,11 @@ class ImageServiceTest {
     @Mock
     private FeedService feedService; // ✅ FeedService Mock 추가
 
+    @Mock
+    private SoftDeleteRepository softDeleteRepository;
+
+    @Mock
+    private PostHashTagRepository postHashTagRepository;
 
     @InjectMocks
     private ImageService imageService;
@@ -127,7 +136,7 @@ class ImageServiceTest {
                 .user(testUser)
                 .build();
 
-        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+        when(userRepository.findByIdAndDeletedIsFalse(1L)).thenReturn(Optional.of(testUser));
         when(postsRepository.save(any(Posts.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // when: 이미지 업로드 서비스 실행
@@ -140,7 +149,7 @@ class ImageServiceTest {
          * - postsRepository.save()가 실행되었는지 확인
          */
         assertNotNull(imageUploadResDto);
-        verify(userRepository).findById(testUser.getId());
+        verify(userRepository).findByIdAndDeletedIsFalse(testUser.getId());
         verify(postsRepository).save(any(Posts.class));
         verify(feedService).createFeedForFollowers(any(Posts.class)); // ✅ feedService 호출 확인
     }
@@ -185,7 +194,7 @@ class ImageServiceTest {
         reqDto.setFile(newFile);
         reqDto.setContent("수정된 내용");
 
-        when(postsRepository.findById(eq(1L))).thenReturn(Optional.of(tempPost));
+        when(postsRepository.findByIdAndDeletedIsFalse(eq(1L))).thenReturn(Optional.of(tempPost));
         when(postsRepository.save(any(Posts.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         //when : imageUpdate() 실행
@@ -200,7 +209,7 @@ class ImageServiceTest {
          */
         assertNotNull(imageUpdateResDto);
         assertEquals("수정된 내용", imageUpdateResDto.getContent());
-        verify(postsRepository).findById(tempPost.getId());
+        verify(postsRepository).findByIdAndDeletedIsFalse(tempPost.getId());
         verify(postsRepository).save(any(Posts.class));
     }
 
@@ -235,9 +244,11 @@ class ImageServiceTest {
                 .user(testUser)
                 .build();
 
-        when(postsRepository.findById(eq(1L))).thenReturn(Optional.of(tempPost));
+        when(postsRepository.findByIdAndDeletedIsFalse(eq(1L))).thenReturn(Optional.of(tempPost));
+        when(softDeleteRepository.save(any(SoftDelete.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        doNothing().when(postHashTagRepository).deleteAllByPostsId(eq(1L));
 
-        //when : imageDelete() 실행
+        //when : imageDelete 실행
         imageService.imageDelete(tempPost.getId(), testUser.getId());
 
         //then : 응답 데이터 검증
@@ -245,8 +256,9 @@ class ImageServiceTest {
          * - findById가 실행되었는지 확인
          * - delete가 실행되었는지 확인
          */
-        verify(postsRepository).findById(tempPost.getId());
-        verify(postsRepository).delete(tempPost);
+        verify(postsRepository).findByIdAndDeletedIsFalse(tempPost.getId());
+        verify(postHashTagRepository).deleteAllByPostsId(tempPost.getId());
+        verify(softDeleteRepository).save(any(SoftDelete.class));
         verify(feedService).deleteFeedByPostId(tempPost.getId()); // ✅ feedService 호출 확인
     }
 
@@ -268,7 +280,7 @@ class ImageServiceTest {
         imageUploadReqDto.setFile(mockMultipartFile);
         imageUploadReqDto.setContent("파일생성");
 
-        when(userRepository.findById(eq(1L))).thenReturn(Optional.empty());
+        when(userRepository.findByIdAndDeletedIsFalse(eq(1L))).thenReturn(Optional.empty());
 
         //when : imageUpload() 실행
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
@@ -280,7 +292,7 @@ class ImageServiceTest {
          * - findById 동작 확인
          */
         assertEquals("해당 유저를 찾을 수 없습니다.", exception.getMessage());
-        verify(userRepository).findById(1L);
+        verify(userRepository).findByIdAndDeletedIsFalse(1L);
     }
 
     /**
@@ -289,7 +301,7 @@ class ImageServiceTest {
     @Test
     public void 게시물을_찾을_수_없습니다(){
         //given : stubbing
-        when(postsRepository.findById(eq(1L))).thenReturn(Optional.empty());
+        when(postsRepository.findByIdAndDeletedIsFalse(eq(1L))).thenReturn(Optional.empty());
 
         //when : imageUpdate(),imageDelete() 실행
         IllegalArgumentException updateException = assertThrows(IllegalArgumentException.class,
@@ -306,7 +318,7 @@ class ImageServiceTest {
          */
         assertEquals("게시물을 찾을 수 없습니다", updateException.getMessage());
         assertEquals("해당 게시물이 없습니다", deleteException.getMessage());
-        verify(postsRepository,times(2)).findById(1L);
+        verify(postsRepository,times(2)).findByIdAndDeletedIsFalse(1L);
     }
 }
 

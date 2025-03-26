@@ -56,10 +56,10 @@ public class FollowServiceTest {
     @Test
     public void testGetFollowingList() {
         // Mock user repository
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
+        when(userRepository.findByIdAndDeletedIsFalse(1L)).thenReturn(Optional.of(user1));
 
         // Mock followRepository to return a list of follows
-        when(followRepository.findByFromUser(user1)).thenReturn(Collections.singletonList(follow));
+        when(followRepository.findByFromUserAndDeletedIsFalse(user1)).thenReturn(Collections.singletonList(follow));
 
         List<FollowDto> followingList = followService.getFollowingList(1L);
 
@@ -74,10 +74,10 @@ public class FollowServiceTest {
     @Test
     public void testGetFollowingListWithNoFollowings() {
         // Mock user repository
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
+        when(userRepository.findByIdAndDeletedIsFalse(1L)).thenReturn(Optional.of(user1));
 
         // Mock followRepository to return empty list
-        when(followRepository.findByFromUser(user1)).thenReturn(Collections.emptyList());
+        when(followRepository.findByFromUserAndDeletedIsFalse(user1)).thenReturn(Collections.emptyList());
 
         List<FollowDto> followingList = followService.getFollowingList(1L);
 
@@ -88,10 +88,10 @@ public class FollowServiceTest {
     @Test
     public void testGetFollowerList() {
         // Mock user repository
-        when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
+        when(userRepository.findByIdAndDeletedIsFalse(2L)).thenReturn(Optional.of(user2));
 
         // Mock followRepository to return a list of follows
-        when(followRepository.findByToUser(user2)).thenReturn(Collections.singletonList(follow));
+        when(followRepository.findByToUserAndDeletedIsFalse(user2)).thenReturn(Collections.singletonList(follow));
 
         List<FollowDto> followerList = followService.getFollowerList(2L);
 
@@ -106,10 +106,10 @@ public class FollowServiceTest {
     @Test
     public void testGetFollowerListWithNoFollowers() {
         // Mock user repository
-        when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
+        when(userRepository.findByIdAndDeletedIsFalse(2L)).thenReturn(Optional.of(user2));
 
         // Mock followRepository to return empty list
-        when(followRepository.findByToUser(user2)).thenReturn(Collections.emptyList());
+        when(followRepository.findByToUserAndDeletedIsFalse(user2)).thenReturn(Collections.emptyList());
 
         List<FollowDto> followerList = followService.getFollowerList(2L);
 
@@ -120,8 +120,8 @@ public class FollowServiceTest {
     @Test
     public void testToggleFollow() {
         // Mock user repository
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
-        when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
+        when(userRepository.findByIdAndDeletedIsFalse(1L)).thenReturn(Optional.of(user1));
+        when(userRepository.findByIdAndDeletedIsFalse(2L)).thenReturn(Optional.of(user2));
 
         // Mock followRepository to return empty result
         when(followRepository.findByFromUserAndToUser(user1, user2)).thenReturn(Optional.empty());

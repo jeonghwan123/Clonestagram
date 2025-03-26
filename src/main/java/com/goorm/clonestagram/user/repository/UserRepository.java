@@ -20,9 +20,14 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
 
-    Page<User> findAllByUsernameContaining(String keyword, Pageable pageable);
+    Page<User> findAllByUsernameContainingAndDeletedIsFalse(String username, Pageable pageable);
 
     //Todo 팔로우 엔티티 추가시 활성화
     @Query("SELECT f.toUser.id FROM Follows f WHERE f.fromUser.id = :userId")
     List<Long> findFollowingUserIdsByFromUserId(@Param("userId") Long userId);
+
+    Optional<User> findByIdAndDeletedIsFalse(Long id);
+    boolean existsByIdAndDeletedIsFalse(Long id);
+
+
 }

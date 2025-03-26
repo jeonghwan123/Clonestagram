@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface PostHashTagRepository extends JpaRepository<PostHashTags, Long> {
-    @Query("SELECT ph.posts FROM PostHashTags ph WHERE ph.hashTags.tagContent LIKE %:keyword% order by ph.posts.createdAt desc ")
+    @Query("SELECT ph.posts FROM PostHashTags ph WHERE ph.hashTags.tagContent LIKE %:keyword% AND ph.posts.deleted = false order by ph.posts.createdAt desc ")
     Page<Posts> findPostsByHashtagKeyword(@Param("keyword") String keyword, Pageable pageable);
 
     void deleteAllByPostsId(Long id);

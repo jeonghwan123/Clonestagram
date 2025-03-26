@@ -9,5 +9,10 @@ public class CommentRequest {
     private Long userId;
     private Long postId;
     private String content;
-    private LocalDateTime createdAt;
+
+    public CommentRequest(Long userId, Long postId, String content) {
+        this.userId = userId;
+        this.postId = postId;
+        this.content = content;
+    }
 }

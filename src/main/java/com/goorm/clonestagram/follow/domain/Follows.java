@@ -19,15 +19,15 @@ public class Follows {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "follower_id")
     private User fromUser;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "following_id")
     private User toUser;
 
-    @Column(name = "follow_created_at", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
