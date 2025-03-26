@@ -59,7 +59,7 @@ public class FollowServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
 
         // Mock followRepository to return a list of follows
-        when(followRepository.findByFromUser(user1)).thenReturn(Collections.singletonList(follow));
+        when(followRepository.findByFromUserAndDeletedIsFalse(user1)).thenReturn(Collections.singletonList(follow));
 
         List<FollowDto> followingList = followService.getFollowingList(1L);
 
@@ -77,7 +77,7 @@ public class FollowServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
 
         // Mock followRepository to return empty list
-        when(followRepository.findByFromUser(user1)).thenReturn(Collections.emptyList());
+        when(followRepository.findByFromUserAndDeletedIsFalse(user1)).thenReturn(Collections.emptyList());
 
         List<FollowDto> followingList = followService.getFollowingList(1L);
 
@@ -91,7 +91,7 @@ public class FollowServiceTest {
         when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
 
         // Mock followRepository to return a list of follows
-        when(followRepository.findByToUser(user2)).thenReturn(Collections.singletonList(follow));
+        when(followRepository.findByToUserAndDeletedIsFalse(user2)).thenReturn(Collections.singletonList(follow));
 
         List<FollowDto> followerList = followService.getFollowerList(2L);
 
@@ -109,7 +109,7 @@ public class FollowServiceTest {
         when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
 
         // Mock followRepository to return empty list
-        when(followRepository.findByToUser(user2)).thenReturn(Collections.emptyList());
+        when(followRepository.findByToUserAndDeletedIsFalse(user2)).thenReturn(Collections.emptyList());
 
         List<FollowDto> followerList = followService.getFollowerList(2L);
 

@@ -61,7 +61,7 @@ public class VideoService {
      */
     public VideoUploadResDto videoUpload(VideoUploadReqDto videoUploadReqDto, Long userId) {
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByIdAndDeletedIsFalse(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
 
         //1. unique 파일명을 생성하기 위해 uuid 사용
@@ -118,7 +118,7 @@ public class VideoService {
 
         boolean updated = false;
         //1. 게시글 ID를 통해 게시글을 찾아 반환
-        Posts posts = postsRepository.findById(postSeq)
+        Posts posts = postsRepository.findByIdAndDeletedIsFalse(postSeq)
                 .orElseThrow(() -> new IllegalArgumentException("게시물을 찾을 수 없습니다"));
 
         if(!posts.getUser().getId().equals(userId)){
@@ -207,7 +207,7 @@ public class VideoService {
      */
     public void videoDelete(Long postSeq, Long userId) {
         //1. 식별자를 토대로 게시글 찾아 반환
-        Posts posts = postsRepository.findById(postSeq)
+        Posts posts = postsRepository.findByIdAndDeletedIsFalse(postSeq)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시물이 없습니다"));
 
         if(!posts.getUser().getId().equals(userId)){

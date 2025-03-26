@@ -1,6 +1,7 @@
 package com.goorm.clonestagram.user.service;
 
 import com.goorm.clonestagram.post.EntityType;
+import com.goorm.clonestagram.post.domain.Posts;
 import com.goorm.clonestagram.post.domain.SoftDelete;
 import com.goorm.clonestagram.post.repository.SoftDeleteRepository;
 import com.goorm.clonestagram.post.dto.PostInfoDto;
@@ -58,10 +59,10 @@ public class ProfileService {
         int followingCount = followRepository.getFollowingCount(userId);
 
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByIdAndDeletedIsFalse(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        List<PostInfoDto> postList = postsRepository.findAllByUserId(userId, PageRequest.of(0, 10))
+        List<PostInfoDto> postList = postsRepository.findAllByUserIdAndDeletedIsFalse(userId, PageRequest.of(0, 10))
                 .stream()
                 .map(PostInfoDto::fromEntity)
                 .toList();
@@ -91,7 +92,7 @@ public class ProfileService {
     @Transactional // 트랜잭션을 관리하여 데이터 무결성을 보장
     public UserProfileDto updateUserProfile(Long userId, UserProfileUpdateDto userProfileUpdateDto) {
         // 사용자 정보를 DB에서 조회, 존재하지 않으면 예외 발생
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByIdAndDeletedIsFalse(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         // 사용자명 업데이트
@@ -152,8 +153,17 @@ public class ProfileService {
     }
 
     public void deleteUserProfile(Long userId) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByIdAndDeletedIsFalse(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        List<Posts> posts = postsRepository.findAllByUserIdAndDeletedIsFalse(userId);
+        for (Posts post : posts) {
+            post.setDeleted(true);
+            post.setDeletedAt(LocalDateTime.now());
+        }
+
+        // 3. 변경된 게시글들을 DB에 저장
+        postsRepository.saveAll(posts);
 
         user.setDeleted(true);
         user.setDeletedAt(LocalDateTime.now());

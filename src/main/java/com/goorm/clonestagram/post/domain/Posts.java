@@ -93,6 +93,9 @@ public class Posts{
 
     @PrePersist
     protected void onCreate() {
+        if (this.deleted == null) {
+            this.deleted = false;
+        }
         this.createdAt = LocalDateTime.now();
     }
 

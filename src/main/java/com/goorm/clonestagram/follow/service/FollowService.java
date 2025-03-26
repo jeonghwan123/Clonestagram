@@ -26,9 +26,9 @@ public class FollowService {
             throw new IllegalArgumentException("자기 자신을 팔로우할 수 없습니다.");
         }
 
-        User fromUser = userRepository.findById(fromUserId)
+        User fromUser = userRepository.findByIdAndDeletedIsFalse(fromUserId)
                 .orElseThrow(() -> new IllegalArgumentException("팔로우하는 사용자를 찾을 수 없습니다."));
-        User toUser = userRepository.findById(toUserId)
+        User toUser = userRepository.findByIdAndDeletedIsFalse(toUserId)
                 .orElseThrow(() -> new IllegalArgumentException("팔로우 받을 사용자를 찾을 수 없습니다."));
 
         followRepository.findByFromUserAndToUser(fromUser, toUser)
@@ -43,11 +43,11 @@ public class FollowService {
     }
 
     public List<FollowDto> getFollowingList(Long userId) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByIdAndDeletedIsFalse(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         // followRepository에서 결과가 없다면 빈 리스트 반환
-        List<Follows> followsList = followRepository.findByFromUser(user);
+        List<Follows> followsList = followRepository.findByFromUserAndDeletedIsFalse(user);
         if (followsList == null || followsList.isEmpty()) {
             return Collections.emptyList();  // 빈 리스트 반환
         }
@@ -66,11 +66,11 @@ public class FollowService {
     }
 
     public List<FollowDto> getFollowerList(Long userId) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByIdAndDeletedIsFalse(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         // followRepository에서 결과가 없다면 빈 리스트 반환
-        List<Follows> followsList = followRepository.findByToUser(user);
+        List<Follows> followsList = followRepository.findByToUserAndDeletedIsFalse(user);
         if (followsList == null || followsList.isEmpty()) {
             return Collections.emptyList();  // 빈 리스트 반환
         }

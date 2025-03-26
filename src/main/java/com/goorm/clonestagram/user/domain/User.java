@@ -80,6 +80,9 @@ public class User{ // BaseTimeEntity를 상속받아 create, update 관리
 
     @PrePersist
     protected void onCreate() {
+        if (this.deleted == null) {
+            this.deleted = false;
+        }
         this.createdAt = LocalDateTime.now();
     }
 

@@ -37,11 +37,11 @@ public class PostService {
      */
     public PostResDto getMyFeed(Long userId, Pageable pageable) {
         //1. userId를 활용해 유저 객체 조회
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByIdAndDeletedIsFalse(userId)
                 .orElseThrow(() -> new IllegalArgumentException("userId = " + userId + " 인 유저가 존재하지 않습니다"));
 
         //2. 해당 유저가 작성한 모든 피드 조회, 페이징 처리
-        Page<Posts> myFeed = postsRepository.findAllByUserId(user.getId(), pageable);
+        Page<Posts> myFeed = postsRepository.findAllByUserIdAndDeletedIsFalse(user.getId(), pageable);
 
         //3. 모든 작업이 완료도니 경우 응답 반환
         return PostResDto.builder()
@@ -59,7 +59,7 @@ public class PostService {
      */
     public PostResDto getAllFeed(Pageable pageable) {
         //1. DB에 저장된 모든 피드 조회
-        Page<Posts> myFeed = postsRepository.findAll(pageable);
+        Page<Posts> myFeed = postsRepository.findAllByDeletedIsFalse(pageable);
 
         //2. 모든 작업이 완료된 경우 반환
         return PostResDto.builder()
@@ -78,7 +78,7 @@ public class PostService {
      */
     public PostResDto getFollowFeed(Long userId, Pageable pageable) {
         //1. userId를 활용해 유저 객체 조회
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByIdAndDeletedIsFalse(userId)
                 .orElseThrow(() -> new IllegalArgumentException("userId = " + userId + " 인 유저가 존재하지 않습니다"));
 
 
@@ -93,7 +93,7 @@ public class PostService {
         //2. 해당 유저의 팔로우 리스트를 조회
         List<Long> followList = userRepository.findFollowingUserIdsByFromUserId(user.getId());
         //3. 팔로우 리스트에 있는 유저들의 피드들을 조회
-        Page<Posts> postsLists = postsRepository.findAllByUserIdIn(followList, pageable);
+        Page<Posts> postsLists = postsRepository.findAllByUserIdInAndDeletedIsFalse(followList, pageable);
 
         //4. 모든 작업이 완료된 경우 반환
         return PostResDto.builder()

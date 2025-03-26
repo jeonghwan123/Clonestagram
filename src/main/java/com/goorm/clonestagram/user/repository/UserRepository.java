@@ -25,4 +25,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     //Todo 팔로우 엔티티 추가시 활성화
     @Query("SELECT f.toUser.id FROM Follows f WHERE f.fromUser.id = :userId")
     List<Long> findFollowingUserIdsByFromUserId(@Param("userId") Long userId);
+
+    Optional<User> findByIdAndDeletedIsFalse(Long id);
+    boolean existsByIdAndDeletedIsFalse(Long id);
+
+
 }

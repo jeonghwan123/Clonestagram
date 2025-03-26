@@ -22,9 +22,9 @@ public class LikeService {
     // 좋아요 토글
     @Transactional
     public void toggleLike(Long userId, Long postId) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByIdAndDeletedIsFalse(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        Posts post = postsRepository.findById(postId)
+        Posts post = postsRepository.findByIdAndDeletedIsFalse(postId)
                 .orElseThrow(() -> new IllegalArgumentException("게시물을 찾을 수 없습니다."));
 
         // userId와 postId를 사용해 좋아요 여부 확인

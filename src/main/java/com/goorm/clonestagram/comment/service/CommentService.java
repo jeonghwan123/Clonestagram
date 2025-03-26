@@ -27,12 +27,12 @@ public class CommentService {
     public CommentEntity createComment(CommentEntity comment) {
 
         // ✅ userId가 존재하는지 확인
-        if (!userRepository.existsById(comment.getUser().getId())) {
+        if (!userRepository.existsByIdAndDeletedIsFalse(comment.getUser().getId())) {
             throw new IllegalArgumentException("존재하지 않는 사용자 ID입니다: " + comment.getUser().getId());
         }
 
         // ✅ postId가 존재하는지 확인
-        if (!postsRepository.existsById(comment.getPosts().getId())) {
+        if (!postsRepository.existsByIdAndDeletedIsFalse(comment.getPosts().getId())) {
             throw new IllegalArgumentException("존재하지 않는 게시글 ID입니다: " + comment.getPosts().getId());
         }
 
@@ -42,10 +42,10 @@ public class CommentService {
 
     @Transactional
     public CommentEntity createCommentWithRollback(CommentRequest commentRequest) {
-        User user = userRepository.findById(commentRequest.getUserId())
+        User user = userRepository.findByIdAndDeletedIsFalse(commentRequest.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("유저가 없습니다"));
-        Posts posts = postsRepository.findById(commentRequest.getPostId())
-                .orElseThrow(() -> new IllegalArgumentException("유저가 없습니다"));
+        Posts posts = postsRepository.findByIdAndDeletedIsFalse(commentRequest.getPostId())
+                .orElseThrow(() -> new IllegalArgumentException("피드가 없습니다"));
 
         return commentRepository.save(CommentEntity.builder()
                 .user(user)
@@ -65,7 +65,7 @@ public class CommentService {
     @Transactional(readOnly = true)
     public List<CommentEntity> getCommentsByPostId(Long postId) {
         // postId가 실제 존재하는지 확인
-        if (!postsRepository.existsById(postId)) {
+        if (!postsRepository.existsByIdAndDeletedIsFalse(postId)) {
             throw new IllegalArgumentException("존재하지 않는 게시글 ID입니다: " + postId);
         }
 
@@ -92,7 +92,7 @@ public class CommentService {
 
         // 2️⃣ 해당 댓글이 속한 게시글 조회 (✔ postId 사용)
         Long postId = comment.getPosts().getId(); // ✅ comment에서 postId 가져오기
-        Posts post = postsRepository.findById(postId) // ✅ postId 기반 조회
+        Posts post = postsRepository.findByIdAndDeletedIsFalse(postId) // ✅ postId 기반 조회
                 .orElseThrow(() -> new IllegalArgumentException("댓글이 속한 게시글이 존재하지 않습니다. postId: " + postId));
 
         // 3️⃣ 댓글 삭제 권한 확인 (댓글 작성자 또는 게시글 작성자)
