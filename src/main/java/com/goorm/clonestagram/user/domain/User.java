@@ -9,6 +9,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -55,7 +56,7 @@ public class User{ // BaseTimeEntity를 상속받아 create, update 관리
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @CreationTimestamp
+    @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
@@ -77,6 +78,8 @@ public class User{ // BaseTimeEntity를 상속받아 create, update 관리
     @OneToMany(mappedBy = "fromUser", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Follows> followers;
 
+    @Version  // 낙관적 락 적용
+    private Integer version ;
 
     @PrePersist
     protected void onCreate() {
