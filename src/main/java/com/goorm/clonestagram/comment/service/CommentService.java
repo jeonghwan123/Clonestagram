@@ -97,7 +97,7 @@ public class CommentService {
 
         // 3️⃣ 댓글 삭제 권한 확인 (댓글 작성자 또는 게시글 작성자)
         if (!comment.getUser().getId().equals(requesterId) && !post.getUser().getId().equals(requesterId)) {
-            throw new IllegalArgumentException("댓글을 삭제할 권한이 없습니다. 요청자 ID: " + requesterId);
+            throw new IllegalArgumentException("댓글을 삭제할 권한이 없습니다.");
         }
 
         // 4️⃣ 삭제 전 로그 출력

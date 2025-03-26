@@ -1,6 +1,7 @@
 package com.goorm.clonestagram.comment.service;
 
 import com.goorm.clonestagram.comment.domain.CommentEntity;
+import com.goorm.clonestagram.comment.dto.CommentRequest;
 import com.goorm.clonestagram.comment.repository.CommentRepository;
 import com.goorm.clonestagram.post.ContentType;
 import com.goorm.clonestagram.post.domain.Posts;
@@ -74,7 +75,7 @@ class CommentServiceTest {
         mockComment = CommentEntity.builder()
                 .id(1L)
                 .user(mockUser)
-                .posts(mockPost2)
+                .posts(mockPost)
                 .content("Test Comment")
                 .build();
 
@@ -104,9 +105,13 @@ class CommentServiceTest {
     void createComment_ShouldSaveComment() {
         // Given: commentRepository.save()가 실행될 때 mockComment를 반환하도록 설정
         when(commentRepository.save(any(CommentEntity.class))).thenReturn(mockComment);
+        when(userRepository.findByIdAndDeletedIsFalse(5L)).thenReturn(Optional.of(mockComment.getUser()));
+        when(postRepository.findByIdAndDeletedIsFalse(100L)).thenReturn(Optional.of(mockComment.getPosts()));
+
+        CommentRequest commentRequest = new CommentRequest(5L, 100L, "Test Comment");
 
         // When: 새로운 댓글을 생성
-        CommentEntity savedComment = commentService.createCommentWithRollback(mockComment);
+        CommentEntity savedComment = commentService.createCommentWithRollback(commentRequest);
 
         // Then: 저장된 댓글이 예상대로 반환되는지 확인
         assertNotNull(savedComment);
@@ -123,7 +128,7 @@ class CommentServiceTest {
     @Test
     void createComment_ShouldThrowException_WhenUserDoesNotExist() {
         // Given: 모든 userId에 대해 false 반환
-        when(userRepository.existsById(anyLong())).thenReturn(false);
+        when(userRepository.existsByIdAndDeletedIsFalse(anyLong())).thenReturn(false);
 
         // When & Then: 예외 발생 여부 확인
         Exception exception = assertThrows(IllegalArgumentException.class,
@@ -133,7 +138,7 @@ class CommentServiceTest {
         assertTrue(exception.getMessage().contains("존재하지 않는 사용자 ID입니다"));
 
         // Verify: userRepository.existsById()가 1번 호출되었는지 확인
-        verify(userRepository, times(1)).existsById(anyLong());
+        verify(userRepository, times(1)).existsByIdAndDeletedIsFalse(anyLong());
         // Verify: commentRepository.save()가 호출되지 않았는지 확인
         verify(commentRepository, never()).save(any(CommentEntity.class));
     }
@@ -144,8 +149,8 @@ class CommentServiceTest {
     @Test
     void createComment_ShouldThrowException_WhenPostDoesNotExist() {
         // Given: 특정 postId (mockComment의 postId)에 대해 false 반환 (게시글이 존재하지 않도록 설정)
-        when(userRepository.existsById(anyLong())).thenReturn(true);
-        when(postRepository.existsById(mockComment.getPosts().getId())).thenReturn(false);
+        when(userRepository.existsByIdAndDeletedIsFalse(anyLong())).thenReturn(true);
+        when(postRepository.existsByIdAndDeletedIsFalse(mockComment.getPosts().getId())).thenReturn(false);
 
         // When & Then: 예외 발생 여부 확인
         Exception exception = assertThrows(IllegalArgumentException.class,
@@ -155,7 +160,7 @@ class CommentServiceTest {
         assertTrue(exception.getMessage().contains("존재하지 않는 게시글 ID입니다"));
 
         // Verify: postRepository.existsById()가 1번 호출되었는지 확인
-        verify(postRepository, times(1)).existsById(mockComment.getPosts().getId());
+        verify(postRepository, times(1)).existsByIdAndDeletedIsFalse(mockComment.getPosts().getId());
         // Verify: commentRepository.save()가 호출되지 않았는지 확인
         verify(commentRepository, never()).save(any(CommentEntity.class));
     }
@@ -230,7 +235,7 @@ class CommentServiceTest {
      */
     @Test
     void getCommentsByPostId_ShouldReturnListOfComments() {
-        when(postRepository.existsById(100L)).thenReturn(true);
+        when(postRepository.existsByIdAndDeletedIsFalse(100L)).thenReturn(true);
 
         // Given: postId=100에 대한 댓글 목록을 반환하도록 설정
         when(commentRepository.findByPostsId(100L)).thenReturn(mockComments);
@@ -251,7 +256,7 @@ class CommentServiceTest {
     @Test
     void getCommentsByPostId_ShouldThrowException_WhenPostDoesNotExist() {
         // Given: postId=999L는 존재하지 않음
-        when(postRepository.existsById(999L)).thenReturn(false);
+        when(postRepository.existsByIdAndDeletedIsFalse(999L)).thenReturn(false);
 
         // When & Then: 예외 발생 여부 확인
         Exception exception = assertThrows(IllegalArgumentException.class,
@@ -263,7 +268,7 @@ class CommentServiceTest {
         assertEquals("존재하지 않는 게시글 ID입니다: 999", exception.getMessage());
 
         // Verify: postRepository.existsById()가 1번 호출되었는지 확인
-        verify(postRepository, times(1)).existsById(999L);
+        verify(postRepository, times(1)).existsByIdAndDeletedIsFalse(999L);
         // Verify: commentRepository.findByPostId()가 호출되지 않았는지 확인
         verify(commentRepository, never()).findByPostsId(anyLong());
     }
@@ -271,7 +276,7 @@ class CommentServiceTest {
     @Test
     void getCommentsByPostId_ShouldThrowException_WhenNoCommentsExist() {
         // Given: postId=100은 존재하지만, 해당 게시글에 댓글이 없음
-        when(postRepository.existsById(100L)).thenReturn(true);
+        when(postRepository.existsByIdAndDeletedIsFalse(100L)).thenReturn(true);
         when(commentRepository.findByPostsId(100L)).thenReturn(Collections.emptyList());
 
         // When & Then: 예외 발생 여부 확인
@@ -284,7 +289,7 @@ class CommentServiceTest {
         assertEquals("해당 게시글(100)에는 댓글이 없습니다.", exception.getMessage());
 
         // Verify: postRepository.existsById()가 1번 호출되었는지 확인
-        verify(postRepository, times(1)).existsById(100L);
+        verify(postRepository, times(1)).existsByIdAndDeletedIsFalse(100L);
         // Verify: commentRepository.findByPostId()가 1번 호출되었는지 확인
         verify(commentRepository, times(1)).findByPostsId(100L);
     }
@@ -297,7 +302,7 @@ class CommentServiceTest {
     void removeComment_ShouldDeleteComment_WhenRequesterIsCommentOwner() {
         // ✅ doReturn().when() 사용하여 더 유연한 stubbing 적용
         doReturn(Optional.of(mockComment)).when(commentRepository).findById(1L);
-        doReturn(Optional.of(mockPost)).when(postRepository).findById(200L);
+        doReturn(Optional.of(mockPost)).when(postRepository).findByIdAndDeletedIsFalse(200L);
 
         // When: 댓글 삭제 요청
         commentService.removeComment(1L, 5L);
@@ -314,7 +319,7 @@ class CommentServiceTest {
     void removeComment_ShouldDeleteComment_WhenRequesterIsPostOwner() {
         // Given: 댓글과 게시글이 존재하고, 요청자가 게시글 작성자임
         doReturn(Optional.of(mockComment)).when(commentRepository).findById(1L);
-        doReturn(Optional.of(mockPost)).when(postRepository).findById(200L);
+        doReturn(Optional.of(mockPost)).when(postRepository).findByIdAndDeletedIsFalse(200L);
 
 
         // When: 게시글 작성자가 댓글 삭제 요청
@@ -331,15 +336,17 @@ class CommentServiceTest {
     void removeComment_ShouldThrowException_WhenRequesterHasNoPermission() {
         // Given: 댓글과 게시글이 존재하지만 요청자가 댓글/게시글 작성자가 아님
         doReturn(Optional.of(mockComment)).when(commentRepository).findById(1L);
-        doReturn(Optional.of(mockPost)).when(postRepository).findById(200L);
+        doReturn(Optional.of(mockPost)).when(postRepository).findByIdAndDeletedIsFalse(200L);
 
         // When & Then: 예외 발생 확인 (잘못된 요청자 ID: 999L)
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             commentService.removeComment(1L, 999L);
         });
+        System.out.println("예외 메시지: " + exception.getMessage());
+
 
         // 예외 메시지 검증
-        assertTrue(exception.getMessage().contains("댓글을 삭제할 권한이 없습니다"));
+        assertTrue(exception.getMessage().contains("댓글을 삭제할 권한이 없습니다."));
 
         // 댓글 삭제가 호출되지 않아야 함
         verify(commentRepository, never()).deleteById(1L);

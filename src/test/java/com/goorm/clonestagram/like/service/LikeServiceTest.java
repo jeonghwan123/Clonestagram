@@ -51,8 +51,8 @@ public class LikeServiceTest {
     @Test
     public void testToggleLikeAddLike() {
         // Given: User and posts are available, and no existing like in the database.
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(postRepository.findById(1L)).thenReturn(Optional.of(post));
+        when(userRepository.findByIdAndDeletedIsFalse(1L)).thenReturn(Optional.of(user));
+        when(postRepository.findByIdAndDeletedIsFalse(1L)).thenReturn(Optional.of(post));
         when(likeRepository.findByUserIdAndPostsId(1L, 1L)).thenReturn(Optional.empty());  // No like exists
 
         // When: User toggles like
@@ -70,8 +70,8 @@ public class LikeServiceTest {
         existingLike.setUser(user);
         existingLike.setPosts(post);
 
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(postRepository.findById(1L)).thenReturn(Optional.of(post));
+        when(userRepository.findByIdAndDeletedIsFalse(1L)).thenReturn(Optional.of(user));
+        when(postRepository.findByIdAndDeletedIsFalse(1L)).thenReturn(Optional.of(post));
         when(likeRepository.findByUserIdAndPostsId(1L, 1L)).thenReturn(Optional.of(existingLike));  // Like already exists
 
         // When: User toggles like

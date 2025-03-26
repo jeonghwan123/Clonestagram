@@ -56,7 +56,7 @@ public class FollowServiceTest {
     @Test
     public void testGetFollowingList() {
         // Mock user repository
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
+        when(userRepository.findByIdAndDeletedIsFalse(1L)).thenReturn(Optional.of(user1));
 
         // Mock followRepository to return a list of follows
         when(followRepository.findByFromUserAndDeletedIsFalse(user1)).thenReturn(Collections.singletonList(follow));
@@ -74,7 +74,7 @@ public class FollowServiceTest {
     @Test
     public void testGetFollowingListWithNoFollowings() {
         // Mock user repository
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
+        when(userRepository.findByIdAndDeletedIsFalse(1L)).thenReturn(Optional.of(user1));
 
         // Mock followRepository to return empty list
         when(followRepository.findByFromUserAndDeletedIsFalse(user1)).thenReturn(Collections.emptyList());
@@ -88,7 +88,7 @@ public class FollowServiceTest {
     @Test
     public void testGetFollowerList() {
         // Mock user repository
-        when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
+        when(userRepository.findByIdAndDeletedIsFalse(2L)).thenReturn(Optional.of(user2));
 
         // Mock followRepository to return a list of follows
         when(followRepository.findByToUserAndDeletedIsFalse(user2)).thenReturn(Collections.singletonList(follow));
@@ -106,7 +106,7 @@ public class FollowServiceTest {
     @Test
     public void testGetFollowerListWithNoFollowers() {
         // Mock user repository
-        when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
+        when(userRepository.findByIdAndDeletedIsFalse(2L)).thenReturn(Optional.of(user2));
 
         // Mock followRepository to return empty list
         when(followRepository.findByToUserAndDeletedIsFalse(user2)).thenReturn(Collections.emptyList());
@@ -120,8 +120,8 @@ public class FollowServiceTest {
     @Test
     public void testToggleFollow() {
         // Mock user repository
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
-        when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
+        when(userRepository.findByIdAndDeletedIsFalse(1L)).thenReturn(Optional.of(user1));
+        when(userRepository.findByIdAndDeletedIsFalse(2L)).thenReturn(Optional.of(user2));
 
         // Mock followRepository to return empty result
         when(followRepository.findByFromUserAndToUser(user1, user2)).thenReturn(Optional.empty());

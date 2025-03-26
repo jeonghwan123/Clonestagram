@@ -56,7 +56,7 @@ public class ProfileServiceTest {
         userRepository.save(user);
 
         // When
-        User foundUser = userRepository.findById(user.getId()).orElse(null);
+        User foundUser = userRepository.findByIdAndDeletedIsFalse(user.getId()).orElse(null);
 
         // Then
         assertNotNull(foundUser);
