@@ -20,7 +20,16 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
 
-    Page<User> findAllByUsernameContainingAndDeletedIsFalse(String username, Pageable pageable);
+    @Query(value = """
+    SELECT * FROM users
+    WHERE MATCH(username) AGAINST(:keyword IN BOOLEAN MODE)
+      AND deleted = false
+""", countQuery = """
+    SELECT COUNT(*) FROM users
+    WHERE MATCH(username) AGAINST(:keyword IN BOOLEAN MODE)
+      AND deleted = false
+""", nativeQuery = true)
+    Page<User> searchUserByFullText(@Param("keyword") String keyword, Pageable pageable);
 
     //Todo 팔로우 엔티티 추가시 활성화
     @Query("SELECT f.toUser.id FROM Follows f WHERE f.fromUser.id = :userId")

@@ -81,15 +81,6 @@ public class PostService {
         User user = userRepository.findByIdAndDeletedIsFalse(userId)
                 .orElseThrow(() -> new IllegalArgumentException("userId = " + userId + " 인 유저가 존재하지 않습니다"));
 
-
-//        Map<Long, Page<Posts>> followFeedMap = new HashMap<>();
-//
-//        List<Follow> followList = user.getFollowing();
-//        for (Follow follow : followList) {
-//            Long followingId = follow.getToUser().getId();
-//            Page<Posts> posts = postsRepository.findAllByUserId(followingId, pageable);
-//            followFeedMap.put(followingId, posts);  // 유저별로 페이지 저장
-//        }
         //2. 해당 유저의 팔로우 리스트를 조회
         List<Long> followList = userRepository.findFollowingUserIdsByFromUserId(user.getId());
         //3. 팔로우 리스트에 있는 유저들의 피드들을 조회

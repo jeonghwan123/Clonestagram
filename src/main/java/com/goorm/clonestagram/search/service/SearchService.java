@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,13 +36,17 @@ public class SearchService {
      * 유저 검색
      * - 검색어를 활용해 검색어와 부분 혹은 전체 일치하는 유저 반환
      *
-     * @param keyword 클라이언트의 검색 키워드
+     * @param rawKeyword 클라이언트의 검색 키워드
      * @param pageable 페이징 기능
      * @return 유저 리스트, 검색된 데이터 수
      */
-    public SearchUserResDto searchUserByKeyword(String keyword, Pageable pageable) {
+    public SearchUserResDto searchUserByKeyword(String rawKeyword, Pageable pageable) {
+        String keyword = Arrays.stream(rawKeyword.split("\\s+"))
+                .filter(s -> !s.isBlank())
+                .map(s -> "+" + s + "*")
+                .collect(Collectors.joining(" "));
         //1. 유저의 이름으로 관련된 데이터 모두 반환, Like 사용
-        Page<User> users = userRepository.findAllByUsernameContainingAndDeletedIsFalse(keyword, pageable);
+        Page<User> users = userRepository.searchUserByFullText(keyword, pageable);
 
         //2. 반환을 위해 users를 UserProfileDto형태로 변환
         Page<UserProfileDto> userProfileDtos = users.map(user -> UserProfileDto.builder()
