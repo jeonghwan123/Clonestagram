@@ -53,8 +53,17 @@ dependencies {
 
     implementation 'io.github.cdimascio:dotenv-java:3.0.0'
 
+
     // H2 데이터베이스 의존성 (테스트 환경에서만 사용)
     testImplementation 'com.h2database:h2'
+
+    // implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // Jakarta Validation 의존성
+    implementation 'jakarta.validation:jakarta.validation-api:3.0.0' // Jakarta Validation API 의존성
+    implementation 'org.hibernate.validator:hibernate-validator:6.2.0.Final' // Hibernate Validator 구현체
+    // Spring Boot Starter Validation (검증 관련 스타터)
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 
 tasks.named('test') {
