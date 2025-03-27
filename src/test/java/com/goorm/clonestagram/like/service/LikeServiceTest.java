@@ -11,11 +11,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 
+@ActiveProfiles("test")  // <- 이게 있어야 test 환경으로 바뀜
 public class LikeServiceTest {
 
     @Mock

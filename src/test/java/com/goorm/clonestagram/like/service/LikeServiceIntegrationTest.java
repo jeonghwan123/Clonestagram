@@ -9,6 +9,7 @@ import com.goorm.clonestagram.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -17,6 +18,7 @@ import static com.goorm.clonestagram.post.ContentType.IMAGE;
 import static com.goorm.clonestagram.post.ContentType.VIDEO;
 import static org.junit.jupiter.api.Assertions.*;
 
+@ActiveProfiles("test")  // <- 이게 있어야 test 환경으로 바뀜
 @SpringBootTest
 @Transactional
 public class LikeServiceIntegrationTest {
@@ -40,6 +42,7 @@ public class LikeServiceIntegrationTest {
         user.setUsername("testUser");
         user.setEmail("test@example.com");
         user.setPassword("password");
+        user.setDeleted(false);
         user = userRepository.save(user);
 
         Posts post = new Posts();
@@ -47,6 +50,7 @@ public class LikeServiceIntegrationTest {
         post.setContent("Test Post");
         post.setContentType(IMAGE);  // contents_type 추가
         post.setMediaName("test-url");   // media_url 추가 (nullable=false일 경우)
+        post.setDeleted(false);
         post = postsRepository.save(post);
 
         // When: 좋아요 토글 (첫 번째 좋아요)
@@ -73,19 +77,22 @@ public class LikeServiceIntegrationTest {
         user1.setUsername("user1");
         user1.setEmail("user1@example.com");
         user1.setPassword("password1");
+        user1.setDeleted(false);
         user1 = userRepository.save(user1);
 
         User user2 = new User();
         user2.setUsername("user2");
         user2.setEmail("user2@example.com");
         user2.setPassword("password2");
+        user2.setDeleted(false);
         user2 = userRepository.save(user2);
 
         Posts post = new Posts();
         post.setUser(user1);
-        post.setContent("Test Post");
+        post.setContent("Test Post1");
         post.setContentType(IMAGE);  // contents_type 추가
         post.setMediaName("test-url");   // media_url 추가 (nullable=false일 경우)
+        post.setDeleted(false);
         post = postsRepository.save(post);
 
         // When: 두 사용자가 좋아요

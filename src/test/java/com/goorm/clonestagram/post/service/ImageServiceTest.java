@@ -20,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
@@ -35,9 +36,9 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 //Todo 로그인 구현 완료 후 유저를 포함하여 테스트 필요
+@ActiveProfiles("test")  // <- 이게 있어야 test 환경으로 바뀜
 class ImageServiceTest {
 
-    private String uploadFolder = "uploads/image/";
 
     private ImageUploadReqDto imageUploadReqDto;
     private ImageUpdateReqDto imageUpdateReqDto;
@@ -65,41 +66,6 @@ class ImageServiceTest {
         MockitoAnnotations.openMocks(this);
         imageUploadReqDto = new ImageUploadReqDto();
         imageUpdateReqDto = new ImageUpdateReqDto();
-        ReflectionTestUtils.setField(imageService, "uploadFolder", "uploads/image");
-    }
-
-    /**
-     * 파일이 올바르게 생성되고 정해진 경로에 저장되는지 테스트
-     */
-    @Test
-    public void 파일생성(){
-        /**
-         * given
-         * - 가상파일 생성
-         */
-
-        MockMultipartFile mockMultipartFile = new MockMultipartFile(
-                "file", "test-image.jpg","image/jpeg","dummy image content".getBytes()
-        );
-
-        /**
-         * when
-         * - 파일 저장
-         */
-        UUID uuid = UUID.randomUUID();
-        String imageFileName = uuid + "_" +mockMultipartFile.getOriginalFilename();
-        Path imageFilePath = Paths.get(uploadFolder + imageFileName);
-        try{
-            Files.createDirectories(Paths.get(uploadFolder));
-            Files.write(imageFilePath, mockMultipartFile.getBytes());
-            /**
-             * then
-             * - 지정된 경로에 파일이 존재하는지 확인
-             */
-            assertTrue(Files.exists(imageFilePath));
-        }catch (IOException e){
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -115,9 +81,7 @@ class ImageServiceTest {
          * - findById : 가상 유저 ID로 실행시 가상 유저 객체 반환
          * - save : Posts 객체 저장 시 Posts 객체 반환
          */
-        MockMultipartFile mockMultipartFile = new MockMultipartFile(
-                "file", "test-image.jpg","image/jpeg","dummy image content".getBytes()
-        );
+        String mockMultipartFile = ".jpg";
 
         imageUploadReqDto.setFile(mockMultipartFile);
         imageUploadReqDto.setContent("테스트 내용");
@@ -186,10 +150,7 @@ class ImageServiceTest {
                 .user(testUser)
                 .build();
 
-        MockMultipartFile newFile = new MockMultipartFile(
-                "file", "new-image.jpg","image/jpeg","dummy image content".getBytes()
-        );
-
+        String newFile = "new-image.jpg";
         ImageUpdateReqDto reqDto = new ImageUpdateReqDto();
         reqDto.setFile(newFile);
         reqDto.setContent("수정된 내용");
@@ -273,9 +234,7 @@ class ImageServiceTest {
          * 가상 데이터 셋팅
          * findById : 유저의 Id가 1L과 같으면 빈 객체 반환
          */
-        MockMultipartFile mockMultipartFile = new MockMultipartFile(
-                "file", "image.jpg","image/jpeg","dummy image content".getBytes()
-        );
+        String mockMultipartFile = "image.jpg";
 
         imageUploadReqDto.setFile(mockMultipartFile);
         imageUploadReqDto.setContent("파일생성");
