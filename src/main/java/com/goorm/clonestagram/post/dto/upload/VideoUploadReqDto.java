@@ -5,6 +5,7 @@ import com.goorm.clonestagram.post.domain.Posts;
 import com.goorm.clonestagram.user.domain.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +18,7 @@ import java.util.List;
  */
 @Getter
 @Setter
+@NoArgsConstructor
 public class VideoUploadReqDto {
 
     private String file;

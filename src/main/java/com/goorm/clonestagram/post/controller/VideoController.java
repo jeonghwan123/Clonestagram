@@ -33,7 +33,9 @@ public class VideoController {
      */
     //Todo TempUserDetail 변경
     @PostMapping(value = "/video")//file 업로드를 위해 추가
-    public ResponseEntity<VideoUploadResDto> videoUpload(@AuthenticationPrincipal TempUserDetail userDetail, VideoUploadReqDto videoUploadReqDto) throws Exception {
+    public ResponseEntity<VideoUploadResDto> videoUpload(
+            @AuthenticationPrincipal TempUserDetail userDetail,
+            @RequestBody VideoUploadReqDto videoUploadReqDto) throws Exception {
 
         Long userId = userDetail.getId();
 
