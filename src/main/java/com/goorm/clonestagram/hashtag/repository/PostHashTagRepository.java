@@ -1,5 +1,6 @@
 package com.goorm.clonestagram.hashtag.repository;
 
+import com.goorm.clonestagram.hashtag.entity.HashTags;
 import com.goorm.clonestagram.post.domain.Posts;
 import com.goorm.clonestagram.hashtag.entity.PostHashTags;
 import org.springframework.data.domain.Page;
@@ -13,4 +14,6 @@ public interface PostHashTagRepository extends JpaRepository<PostHashTags, Long>
     Page<Posts> findPostsByHashtagKeyword(@Param("keyword") String keyword, Pageable pageable);
 
     void deleteAllByPostsId(Long id);
+
+    long countByHashTags(HashTags hashTags);
 }

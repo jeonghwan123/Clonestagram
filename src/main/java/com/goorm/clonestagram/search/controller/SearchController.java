@@ -1,6 +1,7 @@
 package com.goorm.clonestagram.search.controller;
 
 
+import com.goorm.clonestagram.search.dto.HashtagSuggestionDto;
 import com.goorm.clonestagram.search.dto.SearchPostResDto;
 import com.goorm.clonestagram.search.dto.SearchUserResDto;
 import com.goorm.clonestagram.search.service.SearchService;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * 검색 요청을 처리하는 컨트롤러
@@ -90,9 +93,15 @@ public class SearchController {
      * @param pageable 페이징 기능
      * @return 피드 리스트, 검색된 데이터 수
      */
-    @GetMapping("/search/tag")
+    @GetMapping("/tag")
     public ResponseEntity<SearchPostResDto> searchHashTag(@RequestParam @NotBlank String keyword,
                                                           @PageableDefault(size = 20, sort = "posts.createdAt", direction = Sort.Direction.DESC)Pageable pageable) {
         return ResponseEntity.ok(searchService.searchHashTagByKeyword(keyword,pageable));
     }
+
+    @GetMapping("/tag/suggestions")
+    public ResponseEntity<List<HashtagSuggestionDto>> suggestHashtags(@RequestParam("keyword") String keyword) {
+        return ResponseEntity.ok(searchService.getHashtagSuggestions(keyword));
+    }
+
 }

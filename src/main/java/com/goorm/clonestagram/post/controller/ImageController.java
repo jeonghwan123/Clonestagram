@@ -35,10 +35,10 @@ public class ImageController {
      */
     //Todo TempUserDetail 변경
     @SecurityRequirement(name = "bearerAuth")
-    @PostMapping(value = "/image")
+    @PostMapping(value = "/image", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ImageUploadResDto> imageUpload(
             @AuthenticationPrincipal TempUserDetail userDetail,
-            @ModelAttribute ImageUploadReqDto imageUploadReqDto
+            @RequestBody ImageUploadReqDto imageUploadReqDto
     ) {
         try {
             log.info("👉 [imageUpload] 진입");

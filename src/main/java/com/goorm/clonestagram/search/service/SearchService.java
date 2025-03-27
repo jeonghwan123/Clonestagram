@@ -1,9 +1,12 @@
 package com.goorm.clonestagram.search.service;
 
+import com.goorm.clonestagram.hashtag.entity.HashTags;
+import com.goorm.clonestagram.hashtag.repository.HashTagRepository;
 import com.goorm.clonestagram.post.domain.Posts;
 import com.goorm.clonestagram.post.dto.PostInfoDto;
 import com.goorm.clonestagram.follow.repository.FollowRepository;
 import com.goorm.clonestagram.hashtag.repository.PostHashTagRepository;
+import com.goorm.clonestagram.search.dto.HashtagSuggestionDto;
 import com.goorm.clonestagram.search.dto.SearchPostResDto;
 import com.goorm.clonestagram.search.dto.SearchUserResDto;
 import com.goorm.clonestagram.user.domain.User;
@@ -16,6 +19,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -23,6 +29,7 @@ public class SearchService {
 
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
+    private final HashTagRepository hashTagsRepository;
     private final PostHashTagRepository postHashTagRepository;
     /**
      * 유저 검색
@@ -140,5 +147,12 @@ public class SearchService {
                 .postList(userProfileDtos)
                 .totalCount(tagPosts.getTotalElements())
                 .build();
+    }
+
+    public List<HashtagSuggestionDto> getHashtagSuggestions(String keyword) {
+        List<HashTags> tags = hashTagsRepository.findByTagContentContaining(keyword);
+        return tags.stream()
+                .map(tag -> new HashtagSuggestionDto(tag.getTagContent(), postHashTagRepository.countByHashTags(tag)))
+                .collect(Collectors.toList());
     }
 }

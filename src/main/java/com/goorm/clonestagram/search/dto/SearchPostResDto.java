@@ -1,8 +1,8 @@
 package com.goorm.clonestagram.search.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.goorm.clonestagram.post.dto.PostInfoDto;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 import org.springframework.data.domain.Page;
 
 
@@ -11,9 +11,14 @@ import org.springframework.data.domain.Page;
  * - totalCount, postList를 반환
  */
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class SearchPostResDto {
     private Long totalCount;
+
+    @JsonProperty("content")
     private Page<PostInfoDto> postList;
 }
 
