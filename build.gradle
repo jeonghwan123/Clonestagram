@@ -7,10 +7,8 @@ plugins {
 group = 'com.goorm'
 version = '0.0.1-SNAPSHOT'
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
+tasks.withType(JavaCompile).configureEach {
+    options.release = 21
 }
 
 configurations {
