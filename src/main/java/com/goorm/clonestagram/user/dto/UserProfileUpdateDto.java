@@ -18,7 +18,6 @@ public class UserProfileUpdateDto {
     private String username; // 사용자 이름
     private String email; // 이메일
     private String bio; // 자기소개
-    @Schema(type = "string", format = "binary")//file 업로드를 위해 추가
-    private MultipartFile profileImage; // 프로필 이미지
+    private String profileImage; // 프로필 이미지
     private String password; // 비밀번호
 }

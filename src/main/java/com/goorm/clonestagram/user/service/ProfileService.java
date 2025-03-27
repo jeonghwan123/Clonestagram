@@ -38,8 +38,6 @@ public class ProfileService {
     private final PostsRepository postsRepository;
     private final SoftDeleteRepository softDeleteRepository;
 
-    @Value("${image.path}")
-    private String uploadFolder;
 
     /*
     private final PasswordEncoder passwordEncoder;
@@ -121,18 +119,10 @@ public class ProfileService {
         // 프로필 이미지 업데이트
         if (userProfileUpdateDto.getProfileImage() != null && !userProfileUpdateDto.getProfileImage().isEmpty()) {
             // MultipartFile을 ImageUploadReqDto로 변환하여 이미지 업로드 요청
-            ImageUploadReqDto imageUploadReqDto = new ImageUploadReqDto();
-//            imageUploadReqDto.setFile(userProfileUpdateDto.getProfileImage());  // MultipartFile을 set
 
             try {
-                // 이미지 업로드 서비스 호출
-                ImageUploadResDto imageUploadResDto = imageService.imageUpload(imageUploadReqDto, user.getId());
-
-                // 이미지 URL 생성 (업로드된 파일 이름을 사용하여 경로 설정)
-                String imageUrl = uploadFolder + imageUploadResDto.getMediaName(); // 적합한 경로를 설정
-
                 // 프로필 이미지 URL로 업데이트
-                user.setProfileimg(imageUrl);
+                user.setProfileimg(userProfileUpdateDto.getProfileImage());
             } catch (Exception e) {
                 // 예외 처리: 예외 메시지 로그 출력, 사용자에게 에러 메시지 전달 등
                 e.printStackTrace();

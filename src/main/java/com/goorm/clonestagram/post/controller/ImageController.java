@@ -73,15 +73,15 @@ public class ImageController {
      * @return
      */
     //Todo TempUserDetail 변경
-    @PutMapping(value = "/image/{postSeq}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/image/{postSeq}")
     public ResponseEntity<ImageUpdateResDto> imageUpdate(@PathVariable("postSeq") Long postSeq,
                                                          @AuthenticationPrincipal TempUserDetail userDetail,
                                                          ImageUpdateReqDto imageUpdateReqDto){
         Long userId = userDetail.getId();
 
-        if(imageUpdateReqDto.getFile() != null && !imageUpdateReqDto.getFile().toLowerCase().startsWith("image/")){
-            throw new IllegalArgumentException("이미지를 업로드해 주세요");
-        }
+//        if(imageUpdateReqDto.getFile() != null && !imageUpdateReqDto.getFile().toLowerCase().startsWith("image/")){
+//            throw new IllegalArgumentException("이미지를 업로드해 주세요");
+//        }
 
         return ResponseEntity.ok(imageService.imageUpdate(postSeq, imageUpdateReqDto, userId));
     }

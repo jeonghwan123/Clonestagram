@@ -15,7 +15,6 @@ import java.util.List;
 @Setter
 public class ImageUpdateReqDto {
 
-    @Schema(type = "string", format = "binary")//file 업로드를 위해 추가
     private String file;
     private String content;
     private List<String> hashTagList;

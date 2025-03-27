@@ -46,9 +46,6 @@ public class VideoService {
     private final SoftDeleteRepository softDeleteRepository;
     private final FeedService feedService;
 
-    @Value("${video.path}")
-    private String uploadFolder;
-
     /**
      * 영상 업로드
      * - 검증이 끝난 파일의 name과 path를 설정하여 DB와 저장소에 저장
@@ -64,23 +61,14 @@ public class VideoService {
         User user = userRepository.findByIdAndDeletedIsFalse(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
 
-        //1. unique 파일명을 생성하기 위해 uuid 사용
-        UUID uuid = UUID.randomUUID();
-        String videoFileName = uuid + "_" + videoUploadReqDto.getFile().getOriginalFilename();
-        //2. unique 파일명과 upload 위치를 활용해 파일 경로 생성
-        Path videoFilePath = Paths.get(uploadFolder).resolve(videoFileName);
+        String fileUrl = videoUploadReqDto.getFile();
 
-        try{
-            //3. 파일 경로를 활용해 디렉토리를 생성하고 파일을 저장
-            Files.createDirectories(Paths.get(uploadFolder));
-            Files.write(videoFilePath, videoUploadReqDto.getFile().getBytes());
-
-        }catch (IOException e){
-            throw new RuntimeException("파일 저장 중 오류 발생 : " + e.getMessage());
+        if (fileUrl == null || fileUrl.isBlank()) {
+            throw new IllegalArgumentException("Cloudinary 이미지 URL이 필요합니다.");
         }
 
         //4. unique 파일명과 videoUploadReqDto의 값들을 활용해 Entity 객체 생성 후 저장
-        Posts postEntity = videoUploadReqDto.toEntity(videoFileName, user);
+        Posts postEntity = videoUploadReqDto.toEntity(fileUrl, user);
         Posts post = postsRepository.save(postEntity);
 
         //5. Dto에 있는 HashTagList를 저장
@@ -128,32 +116,10 @@ public class VideoService {
         //2. 영상 수정 여부 파악
         if(videoUpdateReqDto.getFile() != null && !videoUpdateReqDto.getFile().isEmpty()){
 
-            //2-1. unique 파일명을 생성하기 위해 uuid 사용
-            UUID uuid = UUID.randomUUID();
-            String videoFileName = uuid + "_" + videoUpdateReqDto.getFile().getOriginalFilename();
+            String fileUrl = videoUpdateReqDto.getFile();
 
-            //2-2. unique 파일명과 upload 위치를 활용해 파일 경로 생성
-            Path videoFilePath = Paths.get(uploadFolder).resolve(videoFileName);
+            posts.setMediaName(fileUrl);
 
-            try{
-                //2-3. 파일 경로를 활용해 디렉토리를 생성하고 파일을 저장
-                Files.write(videoFilePath, videoUpdateReqDto.getFile().getBytes());
-            }catch (IOException e){
-                throw new RuntimeException("파일 저장 중 오류 발생 : " + e.getMessage());
-            }
-            //2-4. 수정된 파일명 반영
-            String oldFileName = posts.getMediaName();
-            posts.setMediaName(videoFileName);
-
-            //2-5. 기존의 파일 삭제
-            Path oldVideoPath = Paths.get(uploadFolder).resolve(oldFileName);
-            try{
-                Files.deleteIfExists(oldVideoPath);
-            } catch (IOException e){
-                throw new RuntimeException("파일 삭제 중 오류 발생 : " + e.getMessage());
-            }
-
-            //2-6. 업데이트 되었음을 표시
             updated = true;
         }
 
@@ -212,14 +178,6 @@ public class VideoService {
 
         if(!posts.getUser().getId().equals(userId)){
             throw new IllegalArgumentException("권한이 없는 유저입니다");
-        }
-
-        //2. 기존에 존재하던 파일 삭제
-        Path filePath = Paths.get(uploadFolder).resolve(posts.getMediaName());
-        try{
-            Files.deleteIfExists(filePath);
-        } catch (IOException e){
-            throw new RuntimeException("파일 삭제 중 오류 발생 : " + e.getMessage());
         }
 
         //3. DB에서 데이터 삭제

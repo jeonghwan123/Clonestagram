@@ -48,9 +48,6 @@ public class ImageService {
     private final FeedService feedService;
     private final FollowRepository followRepository; // 사용자의 팔로워를 조회하기 위함
 
-    @Value("${image.path}")
-    private String uploadFolder;
-
     /**
      * 이미지 업로드
      * - 검증이 끝난 파일의 name과 path를 설정하여 DB와 저장소에 저장
@@ -120,33 +117,10 @@ public class ImageService {
         //2. 이미지 수정 여부 파악
         if(imageUpdateReqDto.getFile() != null && !imageUpdateReqDto.getFile().isEmpty()){
 
-            //2-1. unique 파일명을 생성하기 위해 uuid 사용
-            UUID uuid = UUID.randomUUID();
-            String imageFileName = uuid + "_" + imageUpdateReqDto.getFile();
+            String fileUrl = imageUpdateReqDto.getFile();
 
-            //2-2. unique 파일명과 upload 위치를 활용해 파일 경로 생성
-            Path imageFilePath = Paths.get(uploadFolder).resolve(imageFileName);
+            posts.setMediaName(fileUrl);
 
-            try{
-                //2-3. 파일 경로를 활용해 디렉토리를 생성하고 파일을 저장
-                Files.write(imageFilePath, imageUpdateReqDto.getFile().getBytes());
-            }catch (IOException e){
-                throw new RuntimeException("파일 저장 중 오류 발생 : " + e.getMessage());
-            }
-
-            //2-4. 수정된 파일명 반영
-            String oldFileName = posts.getMediaName();
-            posts.setMediaName(imageFileName);
-
-            //2-5. 기존의 파일 삭제
-            Path oldImagePath = Paths.get(uploadFolder).resolve(oldFileName);
-            try{
-                Files.deleteIfExists(oldImagePath);
-            } catch (IOException e){
-                throw new RuntimeException("파일 삭제 중 오류 발생 : " + e.getMessage());
-            }
-
-            //2-6. 업데이트 되었음을 표시
             updated = true;
         }
 
@@ -205,14 +179,6 @@ public class ImageService {
 
         if(!posts.getUser().getId().equals(userId)){
             throw new IllegalArgumentException("권한이 없는 유저입니다");
-        }
-
-        //2. 기존에 존재하던 파일 삭제
-        Path filePath = Paths.get(uploadFolder).resolve(posts.getMediaName());
-        try{
-            Files.deleteIfExists(filePath);
-        } catch (IOException e){
-            throw new RuntimeException("파일 삭제 중 오류 발생 : " + e.getMessage());
         }
 
         //3. DB에서 데이터 삭제

@@ -32,7 +32,7 @@ public class VideoController {
      * @throws Exception 업로드 도중 발생할 수 있는 예외
      */
     //Todo TempUserDetail 변경
-    @PostMapping(value = "/video", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)//file 업로드를 위해 추가
+    @PostMapping(value = "/video")//file 업로드를 위해 추가
     public ResponseEntity<VideoUploadResDto> videoUpload(@AuthenticationPrincipal TempUserDetail userDetail, VideoUploadReqDto videoUploadReqDto) throws Exception {
 
         Long userId = userDetail.getId();
@@ -43,9 +43,9 @@ public class VideoController {
         }
 
         // 2. 업로드된 파일의 Content-Type이 'video/'로 시작하지 않으면 영상 파일 아님 → 예외 처리
-        if(!videoUploadReqDto.getFile().getContentType().toLowerCase().startsWith("video/")){
-            throw new IllegalArgumentException("영상을 업로드해 주세요");
-        }
+//        if(!videoUploadReqDto.getFile().getContentType().toLowerCase().startsWith("video/")){
+//            throw new IllegalArgumentException("영상을 업로드해 주세요");
+//        }
 
         // 3. 검증이 통과된 경우 서비스 계층 호출 및 응답 반환
         return ResponseEntity.ok(videoService.videoUpload(videoUploadReqDto, userId));
@@ -60,16 +60,16 @@ public class VideoController {
      * @return
      */
     //Todo TempUserDetail 변경
-    @PutMapping(value = "/video/{postSeq}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/video/{postSeq}")
     public ResponseEntity<VideoUpdateResDto> videoUpdate(@PathVariable("postSeq") Long postSeq,
                                                          @AuthenticationPrincipal TempUserDetail userDetail,
                                                          VideoUpdateReqDto videoUpdateReqDto){
 
         Long userId = userDetail.getId();
 
-        if(videoUpdateReqDto.getFile() != null && !videoUpdateReqDto.getFile().getContentType().toLowerCase().startsWith("video/")){
-            throw new IllegalArgumentException("영상을 업로드해 주세요");
-        }
+//        if(videoUpdateReqDto.getFile() != null && !videoUpdateReqDto.getFile().getContentType().toLowerCase().startsWith("video/")){
+//            throw new IllegalArgumentException("영상을 업로드해 주세요");
+//        }
 
         return ResponseEntity.ok(videoService.videoUpdate(postSeq, videoUpdateReqDto, userId));
     }
