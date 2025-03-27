@@ -20,7 +20,7 @@ import java.util.List;
 public class ImageUploadReqDto {
 
     @Schema(type = "string", format = "binary")//file 업로드를 위해 추가
-    private MultipartFile file;
+    private String file;
     private String content;
     private List<String> hashTagList;
 
@@ -28,7 +28,7 @@ public class ImageUploadReqDto {
         return Posts.builder()
                 .user(user)
                 .content(content)
-                .mediaName(imageName)
+                .mediaName(file)
                 .contentType(ContentType.IMAGE)
                 .build();
     }

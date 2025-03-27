@@ -66,47 +66,37 @@ public class ImageService {
         User user = userRepository.findByIdAndDeletedIsFalse(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
 
-        //1. unique 파일명을 생성하기 위해 uuid 사용
-        UUID uuid = UUID.randomUUID();
-        String imageFileName = uuid + "_" + imageUploadReqDto.getFile().getOriginalFilename();
-        //2. unique 파일명과 upload 위치를 활용해 파일 경로 생성
-        Path imageFilePath = Paths.get(uploadFolder).resolve(imageFileName);
+        String fileUrl = imageUploadReqDto.getFile();
 
-        try{
-            //3. 파일 경로를 활용해 디렉토리를 생성하고 파일을 저장
-            Files.createDirectories(Paths.get(uploadFolder));
-            Files.write(imageFilePath, imageUploadReqDto.getFile().getBytes());
-
-        }catch (IOException e){
-            throw new RuntimeException("파일 저장 중 오류 발생 : " + e.getMessage());
+        if (fileUrl == null || fileUrl.isBlank()) {
+            throw new IllegalArgumentException("Cloudinary 이미지 URL이 필요합니다.");
         }
 
-        //4. unique 파일명과 imageUploadReqDto의 값들을 활용해 Entity 객체 생성 후 저장
-        Posts postEntity = imageUploadReqDto.toEntity(imageFileName, user);
+        // 1. Entity 생성 (Cloudinary URL 그대로 사용)
+        Posts postEntity = imageUploadReqDto.toEntity(fileUrl, user);
         Posts post = postsRepository.save(postEntity);
-        // 피드 생성 로직 추가
-        feedService.createFeedForFollowers(post); // posts.getUser().getId() 기반으로 팔로워 조회
 
-        //5. Dto에 있는 HashTagList를 저장
+        // 2. 피드 생성
+        feedService.createFeedForFollowers(post);
+
+        // 3. 해시태그 저장
         for (String tagContent : Optional.ofNullable(imageUploadReqDto.getHashTagList())
                 .orElse(Collections.emptyList())) {
-            //5-1. tagList에서 tag 내용 하나를 추출한 후 조회
             HashTags tag = hashTagRepository.findByTagContent(tagContent)
-                    //5-2. tag가 저장되어 있지 않으면 새롭게 저장
                     .orElseGet(() -> hashTagRepository.save(new HashTags(null, tagContent)));
-            //5-3. 추출된 태그의 id와 피드의 id를 관계테이블에 저장
-            postHashTagRepository.save(new PostHashTags(null,tag,post));
+            postHashTagRepository.save(new PostHashTags(null, tag, post));
         }
 
-        //6. 모든 작업이 완료된 경우 응답 반환
+        // 4. 응답 반환
         return ImageUploadResDto.builder()
                 .content(post.getContent())
                 .type(post.getContentType())
                 .createdAt(post.getCreatedAt())
                 .hashTagList(imageUploadReqDto.getHashTagList())
-                .mediaName(post.getMediaName())
+                .mediaName(post.getMediaName()) // URL 그대로
                 .build();
     }
+
 
     /**
      *
@@ -132,7 +122,7 @@ public class ImageService {
 
             //2-1. unique 파일명을 생성하기 위해 uuid 사용
             UUID uuid = UUID.randomUUID();
-            String imageFileName = uuid + "_" + imageUpdateReqDto.getFile().getOriginalFilename();
+            String imageFileName = uuid + "_" + imageUpdateReqDto.getFile();
 
             //2-2. unique 파일명과 upload 위치를 활용해 파일 경로 생성
             Path imageFilePath = Paths.get(uploadFolder).resolve(imageFileName);

@@ -117,6 +117,7 @@ public class FollowServiceTest {
         assertTrue(followerList.isEmpty());
     }
 
+
     @Test
     public void testToggleFollow() {
         // Mock user repository
@@ -141,5 +142,4 @@ public class FollowServiceTest {
         // Verify that followRepository delete is called
         verify(followRepository, times(1)).delete(follow);
     }
-
 }

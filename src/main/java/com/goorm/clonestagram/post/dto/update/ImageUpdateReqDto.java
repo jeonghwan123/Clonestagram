@@ -16,7 +16,7 @@ import java.util.List;
 public class ImageUpdateReqDto {
 
     @Schema(type = "string", format = "binary")//file 업로드를 위해 추가
-    private MultipartFile file;
+    private String file;
     private String content;
     private List<String> hashTagList;
 

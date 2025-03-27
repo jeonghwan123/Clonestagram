@@ -122,7 +122,7 @@ public class ProfileService {
         if (userProfileUpdateDto.getProfileImage() != null && !userProfileUpdateDto.getProfileImage().isEmpty()) {
             // MultipartFile을 ImageUploadReqDto로 변환하여 이미지 업로드 요청
             ImageUploadReqDto imageUploadReqDto = new ImageUploadReqDto();
-            imageUploadReqDto.setFile(userProfileUpdateDto.getProfileImage());  // MultipartFile을 set
+//            imageUploadReqDto.setFile(userProfileUpdateDto.getProfileImage());  // MultipartFile을 set
 
             try {
                 // 이미지 업로드 서비스 호출

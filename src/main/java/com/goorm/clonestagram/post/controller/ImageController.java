@@ -35,38 +35,33 @@ public class ImageController {
      */
     //Todo TempUserDetail 변경
     @SecurityRequirement(name = "bearerAuth")
-    @PostMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ImageUploadResDto> imageUpload(@AuthenticationPrincipal TempUserDetail userDetail,
-                                                         ImageUploadReqDto imageUploadReqDto) throws Exception {
+    @PostMapping(value = "/image")
+    public ResponseEntity<ImageUploadResDto> imageUpload(
+            @AuthenticationPrincipal TempUserDetail userDetail,
+            @ModelAttribute ImageUploadReqDto imageUploadReqDto
+    ) {
+        try {
+            log.info("👉 [imageUpload] 진입");
 
-        log.info("👉 [imageUpload] 진입");
+            if (userDetail == null) {
+                log.warn("🚫 인증된 사용자 정보가 없습니다.");
+                return ResponseEntity.status(403).build();
+            }
 
-        if (userDetail == null) {
-            log.warn("🚫 인증된 사용자 정보가 없습니다.");
-            return ResponseEntity.status(403).build();
+            Long userId = userDetail.getId();
+            log.info("✅ 인증된 사용자 ID: {}", userId);
+
+            ImageUploadResDto result = imageService.imageUpload(imageUploadReqDto, userId);
+            log.info("✅ 이미지 업로드 완료: {}", result);
+
+            return ResponseEntity.ok(result);
+
+        } catch (Exception e) {
+            log.error("❌ 이미지 업로드 중 오류 발생", e);
+            return ResponseEntity.status(500).build();
         }
-
-        Long userId = userDetail.getId();
-        log.info("✅ 인증된 사용자 ID: {}", userId);
-
-        if (imageUploadReqDto.getFile() == null || imageUploadReqDto.getFile().isEmpty()) {
-            log.warn("🚫 업로드할 파일이 없습니다.");
-            throw new IllegalArgumentException("업로드할 파일이 없습니다");
-        }
-
-        String contentType = imageUploadReqDto.getFile().getContentType();
-        log.info("📎 업로드된 파일 Content-Type: {}", contentType);
-
-        if (!contentType.toLowerCase().startsWith("image/")) {
-            log.warn("🚫 이미지 파일이 아닙니다.");
-            throw new IllegalArgumentException("이미지를 업로드해 주세요");
-        }
-
-        ImageUploadResDto result = imageService.imageUpload(imageUploadReqDto, userId);
-        log.info("✅ 이미지 업로드 완료: {}", result);
-
-        return ResponseEntity.ok(result);
     }
+
 
     /**
      * 이미지 수정
@@ -84,7 +79,7 @@ public class ImageController {
                                                          ImageUpdateReqDto imageUpdateReqDto){
         Long userId = userDetail.getId();
 
-        if(imageUpdateReqDto.getFile() != null && !imageUpdateReqDto.getFile().getContentType().toLowerCase().startsWith("image/")){
+        if(imageUpdateReqDto.getFile() != null && !imageUpdateReqDto.getFile().toLowerCase().startsWith("image/")){
             throw new IllegalArgumentException("이미지를 업로드해 주세요");
         }
 
