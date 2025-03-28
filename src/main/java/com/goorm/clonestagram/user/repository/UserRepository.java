@@ -39,4 +39,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByIdAndDeletedIsFalse(Long id);
 
 
+    boolean existsByEmail(String email);
+
+    User findByEmail(String email);
 }

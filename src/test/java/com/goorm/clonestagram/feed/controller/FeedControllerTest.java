@@ -1,7 +1,8 @@
 package com.goorm.clonestagram.feed.controller;
 import com.goorm.clonestagram.feed.dto.FeedResponseDto;
 import com.goorm.clonestagram.feed.service.FeedService;
-import com.goorm.clonestagram.util.TempUserDetail;
+import com.goorm.clonestagram.user.domain.User;
+import com.goorm.clonestagram.util.CustomUserDetails;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -39,7 +40,12 @@ class FeedControllerTest {
     @Test
     void 피드_조회_성공() {
         // given
-        TempUserDetail mockUser = new TempUserDetail(); // 가짜 사용자
+        User user = new User();
+        user.setId(1L);
+        user.setUsername("test_user");
+        user.setPassword("password");
+        user.setEmail("test@naver.com");
+        CustomUserDetails mockUser = new CustomUserDetails(user); // 가짜 사용자
 
         List<FeedResponseDto> feedList = List.of(
                 FeedResponseDto.builder()
@@ -75,7 +81,7 @@ class FeedControllerTest {
         Long userId = 1L;
         List<Long> postIds = List.of(101L, 102L);
 
-        TempUserDetail userDetails = mock(TempUserDetail.class);
+        CustomUserDetails userDetails = mock(CustomUserDetails.class);
         when(userDetails.getId()).thenReturn(userId);
 
         FeedController.SeenRequest request = new FeedController.SeenRequest();

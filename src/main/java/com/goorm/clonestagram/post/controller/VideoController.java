@@ -6,9 +6,8 @@ import com.goorm.clonestagram.post.dto.update.VideoUpdateResDto;
 import com.goorm.clonestagram.post.dto.upload.VideoUploadReqDto;
 import com.goorm.clonestagram.post.dto.upload.VideoUploadResDto;
 import com.goorm.clonestagram.post.service.VideoService;
-import com.goorm.clonestagram.util.TempUserDetail;
+import com.goorm.clonestagram.util.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -31,10 +30,9 @@ public class VideoController {
      * @return 업로드 성공 시 VideoUploadResDto 반환
      * @throws Exception 업로드 도중 발생할 수 있는 예외
      */
-    //Todo TempUserDetail 변경
     @PostMapping(value = "/video")//file 업로드를 위해 추가
     public ResponseEntity<VideoUploadResDto> videoUpload(
-            @AuthenticationPrincipal TempUserDetail userDetail,
+            @AuthenticationPrincipal CustomUserDetails userDetail,
             @RequestBody VideoUploadReqDto videoUploadReqDto) throws Exception {
 
         Long userId = userDetail.getId();
@@ -43,11 +41,6 @@ public class VideoController {
         if(videoUploadReqDto.getFile() == null || videoUploadReqDto.getFile().isEmpty()){
             throw new IllegalArgumentException("업로드할 파일이 없습니다");
         }
-
-        // 2. 업로드된 파일의 Content-Type이 'video/'로 시작하지 않으면 영상 파일 아님 → 예외 처리
-//        if(!videoUploadReqDto.getFile().getContentType().toLowerCase().startsWith("video/")){
-//            throw new IllegalArgumentException("영상을 업로드해 주세요");
-//        }
 
         // 3. 검증이 통과된 경우 서비스 계층 호출 및 응답 반환
         return ResponseEntity.ok(videoService.videoUpload(videoUploadReqDto, userId));
@@ -61,17 +54,12 @@ public class VideoController {
      * @param videoUpdateReqDto
      * @return
      */
-    //Todo TempUserDetail 변경
     @PutMapping(value = "/video/{postSeq}")
     public ResponseEntity<VideoUpdateResDto> videoUpdate(@PathVariable("postSeq") Long postSeq,
-                                                         @AuthenticationPrincipal TempUserDetail userDetail,
+                                                         @AuthenticationPrincipal CustomUserDetails userDetail,
                                                          VideoUpdateReqDto videoUpdateReqDto){
 
         Long userId = userDetail.getId();
-
-//        if(videoUpdateReqDto.getFile() != null && !videoUpdateReqDto.getFile().getContentType().toLowerCase().startsWith("video/")){
-//            throw new IllegalArgumentException("영상을 업로드해 주세요");
-//        }
 
         return ResponseEntity.ok(videoService.videoUpdate(postSeq, videoUpdateReqDto, userId));
     }
@@ -83,9 +71,8 @@ public class VideoController {
      * @param postSeq 삭제할 게시글 식별자
      * @return ResponseEntity
      */
-    //Todo TempUserDetail 변경
     @DeleteMapping("/video/{postSeq}")
-    public ResponseEntity<?> videoDelete(@PathVariable Long postSeq, @AuthenticationPrincipal TempUserDetail userDetail){
+    public ResponseEntity<?> videoDelete(@PathVariable Long postSeq, @AuthenticationPrincipal CustomUserDetails userDetail){
 
         Long userId = userDetail.getId();
 

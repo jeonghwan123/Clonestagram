@@ -3,7 +3,7 @@ package com.goorm.clonestagram.post.controller;
 import com.goorm.clonestagram.post.dto.PostResDto;
 import com.goorm.clonestagram.post.service.PostService;
 import com.goorm.clonestagram.like.service.LikeService;
-import com.goorm.clonestagram.util.TempUserDetail;
+import com.goorm.clonestagram.util.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -31,9 +31,8 @@ public class PostController {
      * @param pageable 페이징 처리
      * @return 조회 성공시 서비스 호출한 유저 정보와 피드 리스트 반환
      */
-    //Todo TempUserDetail 변경
     @GetMapping("/feeds/me")
-    public ResponseEntity<PostResDto> myFeed(@AuthenticationPrincipal TempUserDetail userDetail,
+    public ResponseEntity<PostResDto> myFeed(@AuthenticationPrincipal CustomUserDetails userDetail,
                                              @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)Pageable pageable
 
     ){
@@ -49,7 +48,6 @@ public class PostController {
      * @param pageable 페이징 처리
      * @return 조회 성공시 서비스 호출한 유저 정보와 피드 리스트 반환
      */
-    //Todo TempUserDetail 변경
     @GetMapping("/feeds/all")
     public ResponseEntity<PostResDto> allFeed(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)Pageable pageable
@@ -66,9 +64,8 @@ public class PostController {
      * @param pageable 페이징 처리
      * @return 조회 성공시 서비스 호출한 유저 정보와 피드 리스트 반환
      */
-    //Todo TempUserDetail 변경
     @GetMapping("/feeds/follow")
-    public ResponseEntity<PostResDto> followFeed(@AuthenticationPrincipal TempUserDetail userDetail,
+    public ResponseEntity<PostResDto> followFeed(@AuthenticationPrincipal CustomUserDetails userDetail,
                                                  @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)Pageable pageable
     ){
         Long userId = userDetail.getId();
@@ -84,7 +81,7 @@ public class PostController {
     }
     // 특정 게시글에 좋아요 추가 또는 취소 (토글)
     @PostMapping("/feeds/{postId}/likes")
-    public ResponseEntity<Void> toggleLike(@PathVariable Long postId, @AuthenticationPrincipal TempUserDetail userDetail) {
+    public ResponseEntity<Void> toggleLike(@PathVariable Long postId, @AuthenticationPrincipal CustomUserDetails userDetail) {
         Long userId = userDetail.getId();
         likeService.toggleLike(userId, postId);  // 서비스 레이어에서 토글 처리
         return ResponseEntity.ok().build();

@@ -5,7 +5,7 @@ import com.goorm.clonestagram.search.dto.HashtagSuggestionDto;
 import com.goorm.clonestagram.search.dto.SearchPostResDto;
 import com.goorm.clonestagram.search.dto.SearchUserResDto;
 import com.goorm.clonestagram.search.service.SearchService;
-import com.goorm.clonestagram.util.TempUserDetail;
+import com.goorm.clonestagram.util.CustomUserDetails;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -56,7 +56,7 @@ public class SearchController {
      * @return 유저 리스트, 검색된 데이터 수
      */
     @GetMapping("/following")
-    public ResponseEntity<SearchUserResDto> searchFollowing(@AuthenticationPrincipal TempUserDetail userDetail,
+    public ResponseEntity<SearchUserResDto> searchFollowing(@AuthenticationPrincipal CustomUserDetails userDetail,
                                                             @RequestParam @NotBlank String keyword,
                                                             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)Pageable pageable){
 
@@ -76,7 +76,7 @@ public class SearchController {
      * @return 유저 리스트, 검색된 데이터 수
      */
     @GetMapping("/follower")
-    public ResponseEntity<SearchUserResDto> searchFollower(@AuthenticationPrincipal TempUserDetail userDetail,
+    public ResponseEntity<SearchUserResDto> searchFollower(@AuthenticationPrincipal CustomUserDetails userDetail,
                                                            @RequestParam @NotBlank String keyword,
                                                            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)Pageable pageable){
 

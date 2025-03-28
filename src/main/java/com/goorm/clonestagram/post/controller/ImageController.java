@@ -1,11 +1,11 @@
 package com.goorm.clonestagram.post.controller;
 
+import com.goorm.clonestagram.util.CustomUserDetails;
 import com.goorm.clonestagram.post.dto.update.ImageUpdateReqDto;
 import com.goorm.clonestagram.post.dto.update.ImageUpdateResDto;
 import com.goorm.clonestagram.post.dto.upload.ImageUploadReqDto;
 import com.goorm.clonestagram.post.dto.upload.ImageUploadResDto;
 import com.goorm.clonestagram.post.service.ImageService;
-import com.goorm.clonestagram.util.TempUserDetail;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -33,11 +33,10 @@ public class ImageController {
      * @return 업로드 성공 시 ImageUploadResDto 반환
      * @throws Exception 업로드 도중 발생할 수 있는 예외
      */
-    //Todo TempUserDetail 변경
     @SecurityRequirement(name = "bearerAuth")
     @PostMapping(value = "/image", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ImageUploadResDto> imageUpload(
-            @AuthenticationPrincipal TempUserDetail userDetail,
+            @AuthenticationPrincipal CustomUserDetails userDetail,
             @RequestBody ImageUploadReqDto imageUploadReqDto
     ) {
         try {
@@ -72,16 +71,11 @@ public class ImageController {
      * @param imageUpdateReqDto
      * @return
      */
-    //Todo TempUserDetail 변경
     @PutMapping(value = "/image/{postSeq}")
     public ResponseEntity<ImageUpdateResDto> imageUpdate(@PathVariable("postSeq") Long postSeq,
-                                                         @AuthenticationPrincipal TempUserDetail userDetail,
+                                                         @AuthenticationPrincipal CustomUserDetails userDetail,
                                                          ImageUpdateReqDto imageUpdateReqDto){
         Long userId = userDetail.getId();
-
-//        if(imageUpdateReqDto.getFile() != null && !imageUpdateReqDto.getFile().toLowerCase().startsWith("image/")){
-//            throw new IllegalArgumentException("이미지를 업로드해 주세요");
-//        }
 
         return ResponseEntity.ok(imageService.imageUpdate(postSeq, imageUpdateReqDto, userId));
     }
@@ -93,9 +87,8 @@ public class ImageController {
      * @param postSeq 삭제할 게시글 식별자
      * @return ResponseEntity
      */
-    //Todo TempUserDetail 변경
     @DeleteMapping("/image/{postSeq}")
-    public ResponseEntity<?> imageDelete(@PathVariable Long postSeq, @AuthenticationPrincipal TempUserDetail userDetail){
+    public ResponseEntity<?> imageDelete(@PathVariable Long postSeq, @AuthenticationPrincipal CustomUserDetails userDetail){
 
         Long userId = userDetail.getId();
 

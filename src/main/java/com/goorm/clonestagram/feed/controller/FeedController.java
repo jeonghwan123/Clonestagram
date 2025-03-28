@@ -2,7 +2,7 @@ package com.goorm.clonestagram.feed.controller;
 
 import com.goorm.clonestagram.feed.dto.FeedResponseDto;
 import com.goorm.clonestagram.feed.service.FeedService;
-import com.goorm.clonestagram.util.TempUserDetail;
+import com.goorm.clonestagram.util.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,7 +25,7 @@ public class FeedController {
      */
     @GetMapping
     public ResponseEntity<Page<FeedResponseDto>> getMyFeed(
-            @AuthenticationPrincipal TempUserDetail userDetails,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
@@ -40,7 +40,7 @@ public class FeedController {
      */
     @DeleteMapping("/seen")
     public ResponseEntity<Void> removeSeenFeeds(
-            @AuthenticationPrincipal TempUserDetail userDetails,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody @Valid SeenRequest request
     ) {
         feedService.removeSeenFeeds(userDetails.getId(), request.getPostIds());
