@@ -1,61 +1,78 @@
 package com.goorm.clonestagram.config;
 
-import com.goorm.clonestagram.util.TempUserDetail;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+
+import com.goorm.clonestagram.login.service.CustomUserDetailsService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
-    // ✅ MockUserFilter: 모든 요청 시 TempUserDetail을 SecurityContext에 강제로 주입
-    @Bean
-    public OncePerRequestFilter mockUserFilter() {
-        return new OncePerRequestFilter() {
-            @Override
-            protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-                    throws ServletException, IOException {
 
-                TempUserDetail tempUserDetail = new TempUserDetail();
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(tempUserDetail, null, tempUserDetail.getAuthorities());
+    private final CustomUserDetailsService customUserDetailsService;
 
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-
-                filterChain.doFilter(request, response);
-            }
-        };
+    // UserDetailsService 주입
+    public SecurityConfig(CustomUserDetailsService customUserDetailsService) {
+        this.customUserDetailsService = customUserDetailsService;
     }
 
-    // ✅ SecurityFilterChain: 모든 요청 허용 + mockUserFilter 추가
+    // BCryptPasswordEncoder를 Bean으로 등록
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();  // BCryptPasswordEncoder 객체 반환
+    }
+
+    // AuthenticationManager 설정
+    @Bean
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder =
+                http.getSharedObject(AuthenticationManagerBuilder.class);
+
+        // 사용자 서비스와 비밀번호 인코더를 설정
+        authenticationManagerBuilder.userDetailsService(customUserDetailsService)
+                .passwordEncoder(bCryptPasswordEncoder());
+
+        // AuthenticationManager를 빈으로 반환
+        return authenticationManagerBuilder.build();
+    }
+
+    // HTTP 보안 설정 (로그인, 로그아웃, CSRF 등)
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .authorizeHttpRequests(authz -> authz
+                        .requestMatchers(
+                                "/login", "/join",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/swagger.html"
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                )
                 .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-                .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-                .addFilterBefore(mockUserFilter(), UsernamePasswordAuthenticationFilter.class);
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .logout(logout -> logout.permitAll())
+                .formLogin(form -> form.disable()) // REST API이므로 formLogin은 끔
+                .httpBasic(basic -> basic.disable()); // httpBasic도 REST에서는 보통 꺼둠 (JWT 기반이면 특히)
 
         return http.build();
     }
+
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
