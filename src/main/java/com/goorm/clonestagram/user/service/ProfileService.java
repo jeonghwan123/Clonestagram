@@ -15,8 +15,11 @@ import com.goorm.clonestagram.user.dto.UserProfileDto;
 import com.goorm.clonestagram.user.dto.UserProfileUpdateDto;
 import com.goorm.clonestagram.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,11 +41,8 @@ public class ProfileService {
     private final PostsRepository postsRepository;
     private final SoftDeleteRepository softDeleteRepository;
 
-
-    /*
-    private final PasswordEncoder passwordEncoder;
-    비밀번호는 암호화하는 과정이 로그인 및 회원가입시에 필요하므로 회원가입이나 로그인 기능 추가되면 비밀번호 조회 및 수정 추가예정
-    */
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     /**
      * 사용자 프로필 조회
@@ -104,12 +104,12 @@ public class ProfileService {
             user.setEmail(userProfileUpdateDto.getEmail());
         }
 
-        /*
-        // 비밀번호 업데이트 (추후 기능 추가 예정)
+
+        // 비밀번호 업데이트
         if (userProfileUpdateDto.getPassword() != null && !userProfileUpdateDto.getPassword().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(userProfileUpdateDto.getPassword()));
+            user.setPassword(bCryptPasswordEncoder.encode(userProfileUpdateDto.getPassword()));
         }
-        */
+
 
         // 자기소개(bio) 업데이트
         if (userProfileUpdateDto.getBio() != null && !userProfileUpdateDto.getBio().isEmpty()) {

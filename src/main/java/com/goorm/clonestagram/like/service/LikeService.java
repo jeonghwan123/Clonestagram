@@ -45,4 +45,5 @@ public class LikeService {
     public Long getLikeCount(Long postId) {
         return likeRepository.countByPostsId(postId);
     }
+
 }

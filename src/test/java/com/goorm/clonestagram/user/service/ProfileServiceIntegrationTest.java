@@ -4,21 +4,20 @@ import com.goorm.clonestagram.user.domain.User;
 import com.goorm.clonestagram.user.dto.UserProfileDto;
 import com.goorm.clonestagram.user.dto.UserProfileUpdateDto;
 import com.goorm.clonestagram.user.repository.UserRepository;
-import com.goorm.clonestagram.follow.repository.FollowRepository;
-import com.goorm.clonestagram.post.repository.PostsRepository;
-import com.goorm.clonestagram.post.service.ImageService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
+@ActiveProfiles("test")
 @SpringBootTest
 @Transactional
-@ActiveProfiles("test") // application-test.properties를 사용하기 위해 설정
 public class ProfileServiceIntegrationTest {
 
     @Autowired
@@ -28,69 +27,73 @@ public class ProfileServiceIntegrationTest {
     private UserRepository userRepository;
 
     @Autowired
-    private FollowRepository followRepository;
-
-    @Autowired
-    private PostsRepository postsRepository;
-
-    @Autowired
-    private ImageService imageService;
+    private BCryptPasswordEncoder passwordEncoder;
 
     private User testUser;
 
     @BeforeEach
     public void setUp() {
-        // 테스트용 유저 생성
+        // 테스트용 사용자 생성
         testUser = User.builder()
-                .username("testUser")
+                .username("testuser")
                 .email("test@example.com")
-                .password("testPassword")
-                .profileimg("default-profile-img.jpg")
-                .bio("This is a test bio")
+                .password(passwordEncoder.encode("oldpassword"))
+                .bio("Test bio")
+                .profileimg("old-profile.jpg")
                 .build();
         userRepository.save(testUser);
     }
 
     @Test
+    @DisplayName("사용자 프로필 조회 테스트")
     public void testGetUserProfile() {
-        // 테스트: 사용자 프로필 조회
-        UserProfileDto userProfile = profileService.getUserProfile(testUser.getId());
+        // When
+        UserProfileDto profileDto = profileService.getUserProfile(testUser.getId());
 
-        assertNotNull(userProfile);
-        assertEquals(testUser.getId(), userProfile.getId());
-        assertEquals(testUser.getUsername(), userProfile.getUsername());
-        assertEquals(testUser.getProfileimg(), userProfile.getProfileimg());
+        // Then
+        assertThat(profileDto).isNotNull();
+        assertThat(profileDto.getUsername()).isEqualTo("testuser");
+        assertThat(profileDto.getEmail()).isEqualTo("test@example.com");
+        assertThat(profileDto.getBio()).isEqualTo("Test bio");
     }
 
     @Test
+    @DisplayName("사용자 프로필 업데이트 테스트")
     public void testUpdateUserProfile() {
-        // 테스트: 사용자 프로필 수정
-        UserProfileUpdateDto updateDto = new UserProfileUpdateDto();
-        updateDto.setUsername("updatedUser");
-        updateDto.setBio("Updated bio");
+        // Given
+        UserProfileUpdateDto updateDto = UserProfileUpdateDto.builder()
+                .username("updateduser")
+                .email("updated@example.com")
+                .password("newpassword")
+                .bio("Updated bio")
+                .profileImage("new-profile.jpg")
+                .build();
 
-        // 이미지 업로드는 Mock 처리해야 할 수 있음, 테스트 목적상 필드값만 업데이트
-        UserProfileDto updatedUser = profileService.updateUserProfile(testUser.getId(), updateDto);
+        // When
+        UserProfileDto updatedProfile = profileService.updateUserProfile(testUser.getId(), updateDto);
 
-        assertNotNull(updatedUser);
-        assertEquals("updatedUser", updatedUser.getUsername());
-        assertEquals("Updated bio", updatedUser.getBio());
+        // Then
+        assertThat(updatedProfile.getUsername()).isEqualTo("updateduser");
+        assertThat(updatedProfile.getEmail()).isEqualTo("updated@example.com");
+        assertThat(updatedProfile.getBio()).isEqualTo("Updated bio");
+
+        // 실제 DB에서 확인
+        User updatedUser = userRepository.findByIdAndDeletedIsFalse(testUser.getId())
+                .orElseThrow();
+
+        // 비밀번호 검증 (암호화되었는지)
+        assertThat(passwordEncoder.matches("newpassword", updatedUser.getPassword())).isTrue();
+        assertThat(updatedUser.getProfileimg()).isEqualTo("new-profile.jpg");
     }
 
+
+
     @Test
-    public void testUpdateUserProfileWithImage() {
-        // 이미지 업로드가 포함된 프로필 업데이트 테스트
-        UserProfileUpdateDto updateDto = new UserProfileUpdateDto();
-        updateDto.setUsername("userWithNewProfileImage");
-        updateDto.setBio("Updated bio with image");
-
-        // 실제 이미지 업로드는 Mock 처리할 수 있지만, 여기에선 이미지만 업데이트하는 테스트
-        UserProfileDto updatedUser = profileService.updateUserProfile(testUser.getId(), updateDto);
-
-        assertNotNull(updatedUser);
-        assertEquals("userWithNewProfileImage", updatedUser.getUsername());
-        assertEquals("Updated bio with image", updatedUser.getBio());
-        // 실제 이미지 URL 확인 (업로드된 파일이 저장된 경로 등)
-        assertTrue(updatedUser.getProfileimg().contains("default-profile-img.jpg"));
+    @DisplayName("존재하지 않는 사용자 프로필 조회 시 예외 발생")
+    public void testGetNonExistentUserProfile() {
+        // When & Then
+        assertThatThrownBy(() -> profileService.getUserProfile(999L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("User not found");
     }
 }
